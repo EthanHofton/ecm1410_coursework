@@ -10,12 +10,56 @@ import cycling.CyclingPortalInterface;
 
 public class CyclingPortal implements CyclingPortalInterface {
 
-    private ArrayList<Rider> riders;
     private ArrayList<Team> teams;
 
-    CyclingPortal() {
-        riders = new ArrayList<>();
+    public CyclingPortal() {
+        // constructior to init lists
         teams = new ArrayList<>();
+    }
+
+    private boolean hasTeam(int teamID) {
+        // check if the list 'teams' has teamID
+        try {
+            findTeam(teamID);
+        } catch (IDNotRecognisedException e) {
+            return false;
+        }
+        return true;
+    }
+
+    private boolean hasRider(int riderID) {
+        // check if the list 'teams' has teamID
+        try {
+            findRider(riderID);
+        } catch (IDNotRecognisedException e) {
+            return false;
+        }
+        return true;
+    }
+
+    private Team findTeam(int teamID) throws IDNotRecognisedException {
+        // check if the list 'teams' has teamID
+        for (int i = 0; i < teams.size(); i++) {
+            if (teams.get(i).getTeamId() == teamID) {
+                return teams.get(i);
+            }
+        }
+
+        throw new IDNotRecognisedException("Team Id '"+teamID+"' not found");
+    }
+
+    private Rider findRider(int riderID) throws IDNotRecognisedException {
+        // check if the list 'teams' has teamID
+        for (int i = 0; i < teams.size(); i++) {
+            for (int j = 0; j < teams.get(i).getRiders().size(); j++)
+            {
+                if (teams.get(i).getRiders().get(j).getRiderId() == riderID) {
+                    return teams.get(i).getRiders().get(j);
+                }
+            }
+        }
+
+        throw new IDNotRecognisedException("Team Id '"+riderID+"' not found");
     }
 
     @Override
@@ -107,55 +151,100 @@ public class CyclingPortal implements CyclingPortalInterface {
         return null;
     }
 
+    // DONE
     @Override
     public int createTeam(String name, String description) throws IllegalNameException, InvalidNameException {
-        // TODO Auto-generated method stub
-        return 0;
+
+        // check if team name allready exists
+        for (Team team : teams) {
+            if (name.equals(team.getTeamName())) {
+                throw new IllegalNameException("Team name allready exisits");
+            }
+        }
+
+        // check the desciption
+        if (name.length() > 30 || name.equals("") || name == null) {
+            throw new InvalidNameException("Name cannot be null, empty or longer then 30");
+        }
+
+        Team newTeam = new Team(name, description);
+        teams.add(newTeam);
+
+        return newTeam.getTeamId();
     }
 
+    // DONE
     @Override
     public void removeTeam(int teamId) throws IDNotRecognisedException {
-        // TODO Auto-generated method stub
-        
+        // Check team exists
+        if (!hasTeam(teamId)) {
+            throw new IDNotRecognisedException("Team with id '"+teamId+"' not found");
+        }
+
+        Team teamToRemove = findTeam(teamId);
+
+        teams.remove(teamToRemove);
     }
 
+    // DONE
     @Override
     public int[] getTeams() {
-        // TODO Auto-generated method stub
-        return null;
+        // return the ids as an array of all the teams
+        int[] teamsToReturn = new int[teams.size()];
+        for (int i = 0; i < teams.size(); i++) {
+            teamsToReturn[i] = teams.get(i).getTeamId();
+        }
+        return teamsToReturn;
     }
 
     @Override
     public int[] getTeamRiders(int teamId) throws IDNotRecognisedException {
         // TODO Auto-generated method stub
+        if (!hasTeam(teamId)) {
+            throw new IDNotRecognisedException("Team with id '"+teamId+"' not found");
+        }
+
+        Team team = findTeam(teamId);
+        int teamRiders[] = new int[team.getRiders().size()];
+
+        for (int i = 0; i < team.getRiders().size(); i++) {
+            teamRiders[i] = team.getRiders().get(i).getRiderId();
+        }
         
-        return null;
+        return teamRiders;
     }
 
+    // DONE
     @Override
     public int createRider(int teamID, String name, int yearOfBirth) throws IDNotRecognisedException, IllegalArgumentException {
     
-        // TODO cheack the teamID exists, if not throw IDNotRecognisedException
-        if ()
-
-        // check year and name
-        if (name == null) {
-            throw new IllegalArgumentException("name cannot be null");
-        } else if (yearOfBirth < 1900) {
-            throw new IllegalArgumentException("cannot be born before 1900");
+        // cheack the teamID exists, if not throw IDNotRecognisedException
+        if (!hasTeam(teamID)) {
+            throw new IDNotRecognisedException("Team with id '"+teamID+"' not found");
         }
 
-        Rider newRider = new Rider(teamID, name, yearOfBirth);
+        // check year and name
+        if (name == null || yearOfBirth < 1900) {
+            throw new IllegalArgumentException("name cannot be null or year less then 1900");
+        }
 
-        riders.add(newRider);
+        Team ridersTeam = findTeam(teamID);
+        Rider newRider = new Rider(ridersTeam, name, yearOfBirth);
+
+        ridersTeam.addRider(newRider);
 
         return newRider.getRiderId();
     }
 
     @Override
     public void removeRider(int riderId) throws IDNotRecognisedException {
-        // TODO Auto-generated method stub
-        
+        if (!hasRider(riderId)) {
+            throw new IDNotRecognisedException("Rider with id '"+riderId+"' not found");
+        }
+
+        Rider rider = findRider(riderId);
+        rider.getTeam().removeRider(rider);
+        // TODO remove all race results (not implamented race)
     }
 
     @Override

@@ -1,18 +1,20 @@
 package cycling;
 
+import cycling.Team;
+
 public class Rider {
 
     private static int riderCount = 0;
 
     private int riderId; // readonly
-    private int teamId; // readonly (write once)
     private String riderName; // readonly (write once)
     private int riderYearOfBirth; // readonly (write once)
+    private Team riderTeam;
 
-    public Rider(int teamId, String riderName, int riderYearOfBirth) {
+    public Rider(Team team, String riderName, int riderYearOfBirth) {
         this.riderId = riderCount++;
 
-        this.teamId = teamId;
+        this.riderTeam = team;
         this.riderName = riderName;
         this.riderYearOfBirth = riderYearOfBirth;
     }
@@ -21,8 +23,8 @@ public class Rider {
         return riderId;
     }
 
-    public int getTeamId() {
-        return teamId;
+    public Team getTeam() {
+        return riderTeam;
     }
 
     public String getRiderName() {
@@ -34,6 +36,6 @@ public class Rider {
     }
 
     public String toString() {
-        return "Rider[riderId="+riderId+",teamId="+teamId+",riderName="+riderName+",riderYearOfBirth="+riderYearOfBirth+"]";
+        return "Rider[riderId="+riderId+",riderTeam="+riderTeam+",riderName="+riderName+",riderYearOfBirth="+riderYearOfBirth+"]";
     }
 }

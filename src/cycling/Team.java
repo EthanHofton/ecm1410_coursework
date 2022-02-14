@@ -5,7 +5,7 @@ import cycling.Rider;
 
 public class Team {
     
-    private static int teamCount;
+    private static int teamCount = 0;
 
     private ArrayList<Rider> teamRiders;
 
@@ -33,18 +33,22 @@ public class Team {
         return teamDescription;
     }
 
+    public ArrayList<Rider> getRiders() {
+        return teamRiders;
+    }
+
     public void addRider(Rider newRider) {
         // add rider to arraylist
         teamRiders.add(newRider);
     }
 
-    public void removeRider(Rider riderToRemove) {
+    public void removeRider(Rider riderToRemove) throws IDNotRecognisedException {
         // try find the riderID 
         try {
             int riderPosition = findRider(riderToRemove);
             teamRiders.remove(riderPosition);
         } catch (IDNotRecognisedException e) {
-            e.printStackTrace();
+            throw new IDNotRecognisedException("Team with id '"+teamId+"' does not have rider with id '"+riderToRemove.getRiderId()+"'");
         }
     }
 
