@@ -13,10 +13,10 @@ public class Rider {
 
     public Rider(Team team, String riderName, int riderYearOfBirth) {
         this.riderId = riderCount++;
-
-        this.riderTeam = team;
+        
         this.riderName = riderName;
         this.riderYearOfBirth = riderYearOfBirth;
+        this.riderTeam = team;
     }
 
     public int getRiderId() {

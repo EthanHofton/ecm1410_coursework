@@ -1,9 +1,12 @@
+import java.time.LocalDateTime;
 import java.util.Arrays;
 
 import cycling.CyclingPortal;
 import cycling.IDNotRecognisedException;
 import cycling.IllegalNameException;
+import cycling.InvalidLengthException;
 import cycling.InvalidNameException;
+import cycling.StageType;
 
 /**
  * A short program to illustrate an app testing some minimal functionality of a
@@ -26,22 +29,16 @@ public class CyclingPortalInterfaceTestApp {
 	 * @throws IDNotRecognisedException
 	 * @throws IllegalArgumentException
 	 */
-	public static void main(String[] args) throws IllegalNameException, InvalidNameException, IllegalArgumentException, IDNotRecognisedException {
+	public static void main(String[] args) throws IllegalNameException, InvalidNameException, IllegalArgumentException, IDNotRecognisedException, InvalidLengthException {
 		System.out.println("The system compiled and started the execution...");
 
         CyclingPortal portal = new CyclingPortal();
+        int race1 = portal.createRace("race1", "description");
 
-        int team = portal.createTeam("ej", "Ethan and Jon");
-        int ethan = portal.createRider(team, "Ethan", 2003);
-        int jon = portal.createRider(team, "Jon", 2003);
-        portal.removeRider(ethan);
-        portal.removeRider(jon);
-        System.out.println(Arrays.toString(portal.getTeamRiders(team)));
+        int stage1 = portal.addStageToRace(race1, "Stage1", "Stage1", 23.1, LocalDateTime.now(), StageType.FLAT);
+        int stage2 = portal.addStageToRace(race1, "Stage2", "Stage2", 19.3, LocalDateTime.now(), StageType.HIGH_MOUNTAIN);
 
-        int team2 = portal.createTeam("2", "2");
-        portal.createRider(team2, "Tim", 2003);
-        portal.createRider(team2, "Anna", 2003);
-        System.out.println(Arrays.toString(portal.getTeamRiders(team2)));
+        System.out.println(portal.viewRaceDetails(race1));
 
 		// assert (portal.getRaceIds().length == 0)
 		// 		: "Innitial SocialMediaPlatform not empty as required or not returning an empty array.";

@@ -43,13 +43,10 @@ public class Team {
     }
 
     public void removeRider(Rider riderToRemove) throws IDNotRecognisedException {
-        // try find the riderID 
-        try {
-            int riderPosition = findRider(riderToRemove);
-            teamRiders.remove(riderPosition);
-        } catch (IDNotRecognisedException e) {
-            throw new IDNotRecognisedException("Team with id '"+teamId+"' does not have rider with id '"+riderToRemove.getRiderId()+"'");
-        }
+        // findRider throws IDNotRecognisedException
+        int riderPosition = findRider(riderToRemove);
+        teamRiders.remove(riderPosition);
+        
     }
 
     public int findRider(Rider riderToFind) throws IDNotRecognisedException {

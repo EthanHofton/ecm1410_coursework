@@ -6,17 +6,23 @@ import java.time.LocalTime;
 import java.util.ArrayList;
 
 import cycling.Rider;
+import cycling.Race;
+import cycling.Team;
 import cycling.CyclingPortalInterface;
 
 public class CyclingPortal implements CyclingPortalInterface {
 
     private ArrayList<Team> teams;
+    private ArrayList<Race> races;
 
+    // DONE
     public CyclingPortal() {
         // constructior to init lists
         teams = new ArrayList<>();
+        races = new ArrayList<>();
     }
 
+    // DONE
     private boolean hasTeam(int teamID) {
         // check if the list 'teams' has teamID
         try {
@@ -27,8 +33,10 @@ public class CyclingPortal implements CyclingPortalInterface {
         return true;
     }
 
+    // DONE
     private boolean hasRider(int riderID) {
-        // check if the list 'teams' has teamID
+        
+        // check if the list 'teams' has riderID
         try {
             findRider(riderID);
         } catch (IDNotRecognisedException e) {
@@ -37,6 +45,19 @@ public class CyclingPortal implements CyclingPortalInterface {
         return true;
     }
 
+    // DONE
+    private boolean hasRace(int raceID) {
+        
+        // check if the list 'teams' has riderID
+        try {
+            findRace(raceID);
+        } catch (IDNotRecognisedException e) {
+            return false;
+        }
+        return true;
+    }
+
+    // DONE
     private Team findTeam(int teamID) throws IDNotRecognisedException {
         // check if the list 'teams' has teamID
         for (int i = 0; i < teams.size(); i++) {
@@ -48,74 +69,164 @@ public class CyclingPortal implements CyclingPortalInterface {
         throw new IDNotRecognisedException("Team Id '"+teamID+"' not found");
     }
 
+    // DONE
     private Rider findRider(int riderID) throws IDNotRecognisedException {
         // check if the list 'teams' has teamID
         for (int i = 0; i < teams.size(); i++) {
-            for (int j = 0; j < teams.get(i).getRiders().size(); j++)
-            {
+            for (int j = 0; j < teams.get(i).getRiders().size(); j++) {
                 if (teams.get(i).getRiders().get(j).getRiderId() == riderID) {
                     return teams.get(i).getRiders().get(j);
                 }
             }
         }
 
-        throw new IDNotRecognisedException("Team Id '"+riderID+"' not found");
+        throw new IDNotRecognisedException("Rider Id '"+riderID+"' not found");
     }
 
+    // DONE
+    private Race findRace(int raceID) throws IDNotRecognisedException {
+        // check if the list 'races' has raceID
+        for (int i = 0; i < races.size(); i++) {
+            if (races.get(i).getRaceId() == raceID) {
+                return races.get(i);
+            }
+        }
+
+        throw new IDNotRecognisedException("Race Id '"+raceID+"' not found");
+    }
+
+    // DONE
+    private Stage findStage(int stageId) throws IDNotRecognisedException {
+        // check if the list 'races' has stageId
+        for (int i = 0; i < races.size(); i++) {
+            for (int j = 0; j < races.get(i).getStages().size(); j++) {
+                if (races.get(i).getStages().get(j).getStageId() == stageId) {
+                    return races.get(i).getStages().get(j);
+                }
+            }
+        }
+
+        throw new IDNotRecognisedException("Stage Id '"+stageId+"' not found");
+    }
+
+    // DONE
     @Override
     public int[] getRaceIds() {
-        // TODO Auto-generated method stub
-        return null;
+        int raceIds[] = new int[races.size()];
+        for (int i = 0; i < races.size(); i++) {
+            raceIds[i] = races.get(i).getRaceId();
+        }
+
+        return raceIds;
     }
 
+    // DONE
     @Override
     public int createRace(String name, String description) throws IllegalNameException, InvalidNameException {
-        // TODO Auto-generated method stub
-        return 0;
+        if (name == null || name.equals("") || name.length() > 30 || name.contains(" ")) {
+            throw new InvalidNameException("name cannot be null, empty, have more than 30 characters or contain white spaces");
+        }
+
+        for (int i = 0; i < races.size(); i++) {
+            if (name.equals(races.get(i).getName())) {
+                throw new IllegalNameException("name alrwdy exists in platform");
+            }
+        }
+
+        Race race = new Race(name, description);
+
+        races.add(race);
+
+        return race.getRaceId();
     }
 
+    // DONE
     @Override
     public String viewRaceDetails(int raceId) throws IDNotRecognisedException {
-        // TODO Auto-generated method stub
-        return null;
+        Race race = findRace(raceId);
+        double totalLen = 0.0;
+        for (Stage stage : race.getStages()) {
+            totalLen += stage.getLength();
+        }
+        String raceDetails = "raceID="+raceId;
+        raceDetails += ",name="+race.getName();
+        raceDetails += ",description="+race.getDescription();
+        raceDetails += ",numberOfStages="+race.getStages().size();
+        raceDetails += ",totalLength="+totalLen;
+        return raceDetails;
     }
 
+    // HALF-DONE
     @Override
     public void removeRaceById(int raceId) throws IDNotRecognisedException {
-        // TODO Auto-generated method stub
-        
+        Race raceToRemove = findRace(raceId);
+        races.remove(raceToRemove);
+
+        // remove related info, Stages, segments, results
     }
 
+    // DONE
     @Override
     public int getNumberOfStages(int raceId) throws IDNotRecognisedException {
-        // TODO Auto-generated method stub
-        return 0;
+        Race race = findRace(raceId);
+        return race.getStages().size();
     }
 
+    // DONE
     @Override
     public int addStageToRace(int raceId, String stageName, String description, double length, LocalDateTime startTime,
             StageType type)
             throws IDNotRecognisedException, IllegalNameException, InvalidNameException, InvalidLengthException {
-        // TODO Auto-generated method stub
-        return 0;
+        Race race = findRace(raceId);
+        
+        for (int i = 0; i < race.getStages().size(); i++) {
+            if (race.getStages().get(i).getStageName().equals(stageName)) {
+                throw new IllegalNameException("name already exists on platform");
+            }
+        }
+
+        if (stageName == null || stageName.equals("") || stageName.length() > 30) {
+            throw new InvalidNameException("Name cannot be null, empty or more than 30 characters");
+        }
+
+        if (length < 5) {
+            throw new InvalidLengthException("Length cannot be less than 5km");
+        }
+
+        Stage stage = new Stage(race, stageName, description, length, startTime, type);
+
+        race.addStage(stage);
+
+        return stage.getStageId();
     }
 
+    // DONE
     @Override
     public int[] getRaceStages(int raceId) throws IDNotRecognisedException {
-        // TODO Auto-generated method stub
-        return null;
+        Race race = findRace(raceId);
+        int stageIds[] = new int[race.getStages().size()];
+
+        for (int i = 0; i < stageIds.length; i++) {
+            stageIds[i] = race.getStages().get(i).getStageId();
+        }
+
+        return stageIds;
     }
 
+    // DONE
     @Override
     public double getStageLength(int stageId) throws IDNotRecognisedException {
-        // TODO Auto-generated method stub
-        return 0;
+        Stage stage = findStage(stageId);
+        return stage.getLength();
     }
 
+    // HALF-DONE
     @Override
     public void removeStageById(int stageId) throws IDNotRecognisedException {
-        // TODO Auto-generated method stub
-        
+        Stage stage = findStage(stageId);
+        stage.getRace().removeStage(stage);
+
+        // TODO remove stage segments and results
     }
 
     @Override
@@ -176,13 +287,8 @@ public class CyclingPortal implements CyclingPortalInterface {
     // DONE
     @Override
     public void removeTeam(int teamId) throws IDNotRecognisedException {
-        // Check team exists
-        if (!hasTeam(teamId)) {
-            throw new IDNotRecognisedException("Team with id '"+teamId+"' not found");
-        }
-
+        // throws IDNotRecognisedException
         Team teamToRemove = findTeam(teamId);
-
         teams.remove(teamToRemove);
     }
 
@@ -197,13 +303,10 @@ public class CyclingPortal implements CyclingPortalInterface {
         return teamsToReturn;
     }
 
+    //DONE
     @Override
     public int[] getTeamRiders(int teamId) throws IDNotRecognisedException {
-        // TODO Auto-generated method stub
-        if (!hasTeam(teamId)) {
-            throw new IDNotRecognisedException("Team with id '"+teamId+"' not found");
-        }
-
+        // Throws IDNotRecognisedException
         Team team = findTeam(teamId);
         int teamRiders[] = new int[team.getRiders().size()];
 
@@ -218,16 +321,12 @@ public class CyclingPortal implements CyclingPortalInterface {
     @Override
     public int createRider(int teamID, String name, int yearOfBirth) throws IDNotRecognisedException, IllegalArgumentException {
     
-        // cheack the teamID exists, if not throw IDNotRecognisedException
-        if (!hasTeam(teamID)) {
-            throw new IDNotRecognisedException("Team with id '"+teamID+"' not found");
-        }
-
         // check year and name
         if (name == null || yearOfBirth < 1900) {
             throw new IllegalArgumentException("name cannot be null or year less then 1900");
         }
 
+        // throws IDNotRecognisedException
         Team ridersTeam = findTeam(teamID);
         Rider newRider = new Rider(ridersTeam, name, yearOfBirth);
 
@@ -236,12 +335,10 @@ public class CyclingPortal implements CyclingPortalInterface {
         return newRider.getRiderId();
     }
 
+    // HALF-DONE
     @Override
     public void removeRider(int riderId) throws IDNotRecognisedException {
-        if (!hasRider(riderId)) {
-            throw new IDNotRecognisedException("Rider with id '"+riderId+"' not found");
-        }
-
+        // throws IDNotRecognisedException
         Rider rider = findRider(riderId);
         rider.getTeam().removeRider(rider);
         // TODO remove all race results (not implamented race)
