@@ -11,6 +11,14 @@ public class ClimbSegment extends Segment {
         this.length = length;
     }
 
+    public Double getAverageGradient() {
+        return this.averageGradient;
+    }
+
+    public Double getLength() {
+        return this.length;
+    }
+
     @Override
     boolean isClimb() {
         return true;

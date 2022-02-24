@@ -60,6 +60,7 @@ public class CyclingPortal implements CyclingPortalInterface {
     // DONE
     private Team findTeam(int teamID) throws IDNotRecognisedException {
         // check if the list 'teams' has teamID
+        // O(n)
         for (int i = 0; i < teams.size(); i++) {
             if (teams.get(i).getTeamId() == teamID) {
                 return teams.get(i);
@@ -72,6 +73,7 @@ public class CyclingPortal implements CyclingPortalInterface {
     // DONE
     private Rider findRider(int riderID) throws IDNotRecognisedException {
         // check if the list 'teams' has teamID
+        // O(n^2)
         for (int i = 0; i < teams.size(); i++) {
             for (int j = 0; j < teams.get(i).getRiders().size(); j++) {
                 if (teams.get(i).getRiders().get(j).getRiderId() == riderID) {
@@ -86,6 +88,7 @@ public class CyclingPortal implements CyclingPortalInterface {
     // DONE
     private Race findRace(int raceID) throws IDNotRecognisedException {
         // check if the list 'races' has raceID
+        // O(n)
         for (int i = 0; i < races.size(); i++) {
             if (races.get(i).getRaceId() == raceID) {
                 return races.get(i);
@@ -98,6 +101,7 @@ public class CyclingPortal implements CyclingPortalInterface {
     // DONE
     private Stage findStage(int stageId) throws IDNotRecognisedException {
         // check if the list 'races' has stageId
+        // O(n^2)
         for (int i = 0; i < races.size(); i++) {
             for (int j = 0; j < races.get(i).getStages().size(); j++) {
                 if (races.get(i).getStages().get(j).getStageId() == stageId) {
@@ -107,6 +111,41 @@ public class CyclingPortal implements CyclingPortalInterface {
         }
 
         throw new IDNotRecognisedException("Stage Id '"+stageId+"' not found");
+    }
+
+    // DONE
+    private Segment findSegment(int segmentId) throws IDNotRecognisedException {
+        // check if the list 'races' has Segment with id segmentId
+
+        // O(n^3)
+        for (int i = 0; i < races.size(); i++) {
+            Race currentRace = races.get(i);
+            for (int j = 0; j < currentRace.getStages().size(); j++) {
+                Stage currentStage = currentRace.getStages().get(j);
+                for (int m = 0; m < currentStage.getSegments().size(); m++) {
+                    Segment currentSegment = currentStage.getSegments().get(m);
+                    if (currentSegment.getSegmentId() == segmentId) {
+                        return currentSegment;
+                    }
+                }
+            }
+        }
+
+        throw new IDNotRecognisedException("Segment Id '"+segmentId+"' not found");
+    }
+
+    // DONE
+    private Segment findSegment(int segmentId, Stage stage) throws IDNotRecognisedException {
+        // check if the list 'races' has Segment with id segmentId
+
+        // O(n^3)
+        for (int i = 0; i < stage.getSegments().size(); i++) {
+            if (stage.getSegments().get(i).getSegmentId() == segmentId) {
+                return stage.getSegments().get(i);
+            }
+        }
+
+        throw new IDNotRecognisedException("Segment Id '"+segmentId+"' not found");
     }
 
     // DONE
@@ -229,37 +268,111 @@ public class CyclingPortal implements CyclingPortalInterface {
         // TODO remove stage segments and results
     }
 
+    // DONE
     @Override
     public int addCategorizedClimbToStage(int stageId, Double location, SegmentType type, Double averageGradient,
             Double length) throws IDNotRecognisedException, InvalidLocationException, InvalidStageStateException,
             InvalidStageTypeException {
-        // TODO Auto-generated method stub
-        return 0;
+        
+        if (type == SegmentType.SPRINT) {
+            throw new IllegalArgumentException("Segment type is not valid.");
+        }
+
+        // throws IDNotRecognisedException
+        Stage stage = findStage(stageId);
+
+        if (stage.getLength() < location) {
+            throw new InvalidLocationException("location is out of bounds of the stage length");
+        }
+
+        // throws InvalidStageStateException
+        if (stage.getStageState() == StageState.WAITING_FOR_RESULTS) {
+            throw new InvalidStageStateException("Stage cannot be removed while waiting for results");
+        }
+
+        if (stage.getType() == StageType.TT) {
+            throw new InvalidStageTypeException("Time-trial stages cannot contain any segment");
+        }
+
+        ClimbSegment segment = new ClimbSegment(stage, location, type, averageGradient, length);
+
+        stage.addSegment(segment);
+
+        return segment.getSegmentId();
     }
 
+    // DONE
     @Override
     public int addIntermediateSprintToStage(int stageId, double location) throws IDNotRecognisedException,
             InvalidLocationException, InvalidStageStateException, InvalidStageTypeException {
-        // TODO Auto-generated method stub
-        return 0;
+
+        // trows IDNotRecognisedException
+        Stage stage = findStage(stageId);
+
+        if (stage.getLength() < location) {
+            throw new InvalidLocationException("location is out of bounds of the stage length");
+        }
+
+        // throws InvalidStageStateException
+        if (stage.getStageState() == StageState.WAITING_FOR_RESULTS) {
+            throw new InvalidStageStateException("Stage cannot be removed while waiting for results");
+        }
+
+        if (stage.getType() == StageType.TT) {
+            throw new InvalidStageTypeException("Time-trial stages cannot contain any segment");
+        }
+
+        SprintSegment segment = new SprintSegment(stage, location);
+
+        stage.addSegment(segment);
+        
+        return segment.getSegmentId();
     }
 
+    // DONE
     @Override
     public void removeSegment(int segmentId) throws IDNotRecognisedException, InvalidStageStateException {
-        // TODO Auto-generated method stub
+        
+        // throws IDNotRecognisedException
+        Segment segmentToRemove = findSegment(segmentId);
+
+        Stage stage = segmentToRemove.getStage();
+
+        // throws InvalidStageStateException
+        if (stage.getStageState() == StageState.WAITING_FOR_RESULTS) {
+            throw new InvalidStageStateException("Stage cannot be removed while waiting for results");
+        }
+
+        // remove segment from stage
+        stage.removeSegment(segmentToRemove);
         
     }
 
+    // DONE
     @Override
     public void concludeStagePreparation(int stageId) throws IDNotRecognisedException, InvalidStageStateException {
-        // TODO Auto-generated method stub
         
+        // throws IDNotRecognisedExceiption
+        Stage stage = findStage(stageId);
+
+        // throws InvalidStageStateException
+        stage.concludeStagePreparation();
     }
 
+    // DONE
     @Override
     public int[] getStageSegments(int stageId) throws IDNotRecognisedException {
-        // TODO Auto-generated method stub
-        return null;
+
+        // throws IDNotRecognisedExceiption
+        Stage stage = findStage(stageId);
+
+        int[] stageSegmentIds = new int[stage.getSegments().size()];
+
+        for (int i = 0; i < stageSegmentIds.length; i++) {
+            stageSegmentIds[i] = stage.getSegments().get(i).getSegmentId();
+        }
+
+        return stageSegmentIds;
     }
 
     // DONE

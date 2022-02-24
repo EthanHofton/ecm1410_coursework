@@ -5,7 +5,11 @@ import cycling.CyclingPortal;
 import cycling.IDNotRecognisedException;
 import cycling.IllegalNameException;
 import cycling.InvalidLengthException;
+import cycling.InvalidLocationException;
 import cycling.InvalidNameException;
+import cycling.InvalidStageStateException;
+import cycling.InvalidStageTypeException;
+import cycling.SegmentType;
 import cycling.StageType;
 
 /**
@@ -28,20 +32,20 @@ public class CyclingPortalInterfaceTestApp {
 	 * @throws IllegalNameException
 	 * @throws IDNotRecognisedException
 	 * @throws IllegalArgumentException
+	 * @throws InvalidStageTypeException
+	 * @throws InvalidStageStateException
+	 * @throws InvalidLocationException
 	 */
-	public static void main(String[] args) throws IllegalNameException, InvalidNameException, IllegalArgumentException, IDNotRecognisedException, InvalidLengthException {
+	public static void main(String[] args) throws IllegalNameException, InvalidNameException, IllegalArgumentException, IDNotRecognisedException, InvalidLengthException, InvalidLocationException, InvalidStageStateException, InvalidStageTypeException {
 		System.out.println("The system compiled and started the execution...");
 
         CyclingPortal portal = new CyclingPortal();
         int race1 = portal.createRace("race1", "description");
 
         int stage1 = portal.addStageToRace(race1, "Stage1", "Stage1", 23.1, LocalDateTime.now(), StageType.FLAT);
-        int stage2 = portal.addStageToRace(race1, "Stage2", "Stage2", 19.3, LocalDateTime.now(), StageType.HIGH_MOUNTAIN);
 
-        System.out.println(portal.viewRaceDetails(race1));
+        int segment1 = portal.addCategorizedClimbToStage(stage1, Double.valueOf(12), SegmentType.C1, Double.valueOf(24), Double.valueOf(12));
 
-		// assert (portal.getRaceIds().length == 0)
-		// 		: "Innitial SocialMediaPlatform not empty as required or not returning an empty array.";
 
 	}
 
