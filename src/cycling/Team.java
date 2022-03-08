@@ -1,18 +1,32 @@
 package cycling;
 
 import java.util.ArrayList;
-import cycling.Rider;
 
+
+/**
+ * Team class stores team ID and data relavent to team
+ * 
+ * @author Ethan Hofton
+ * @author Jon Tau
+ * @version 1.0
+ * 
+ */
 public class Team {
     
     private static int teamCount = 0;
 
     private ArrayList<Rider> teamRiders;
 
-    private int teamId; // readonly (write once)
-    private String teamName; // readonly (write once)
-    private String teamDescription; // readonly (write once)
+    private int teamId;
+    private String teamName;
+    private String teamDescription;
 
+    /**
+     * Team construtor. initalises team ID
+     * 
+     * @param teamName the name of the team
+     * @param teamDescription the team description
+     */
     Team(String teamName, String teamDescription) {
         this.teamRiders = new ArrayList<>();
         this.teamId = teamCount++;
@@ -21,27 +35,61 @@ public class Team {
         this.teamDescription = teamDescription;
     }
 
+    /**
+     * Getter for {@code this.teamId}
+     * 
+     * @return the id of the team
+     */
     public int getTeamId() {
         return teamId;
     }
 
+    /**
+     * Getter for {@code this.teamName}
+     * 
+     * @return the name of the team
+     */
     public String getTeamName() {
         return teamName;
     }
 
+    /**
+     * Getter for {@code this.teamDescription}
+     * 
+     * @return the desciption of the team
+     */
     public String getTeamDescription() {
         return teamDescription;
     }
 
+    /**
+     * Getter for {@code this.teamRiders}
+     * 
+     * @return an array of the riders on the team
+     * @see cycling.Rider
+     */
     public ArrayList<Rider> getRiders() {
         return teamRiders;
     }
 
+    /**
+     * add rider to team
+     * 
+     * @param newRider the rider to add to the team
+     * @see cycling.Rider
+     */
     public void addRider(Rider newRider) {
         // add rider to arraylist
         teamRiders.add(newRider);
     }
 
+    /**
+     * remove a rider from the team
+     * 
+     * @param riderToRemove the rider to remove from the team
+     * @throws IDNotRecognisedException if the rider is not in the team
+     * @see cycling.Rider
+     */
     public void removeRider(Rider riderToRemove) throws IDNotRecognisedException {
         // findRider throws IDNotRecognisedException
         int riderPosition = findRider(riderToRemove);
@@ -49,6 +97,14 @@ public class Team {
         
     }
 
+    /**
+     * return the index of the rider in {@code this.teamRiders}
+     * 
+     * @param riderToFind the rider to find
+     * @return the index of the rider in the rider array
+     * @throws IDNotRecognisedException if the rider is not in the team
+     * @see cycling.Rider
+     */
     public int findRider(Rider riderToFind) throws IDNotRecognisedException {
 
         // loops through all team riders
@@ -63,6 +119,13 @@ public class Team {
         throw new IDNotRecognisedException("Rider id not found");
     }
 
+    /**
+     * Check if the rider is in the team
+     * 
+     * @param riderToFind the rider to find
+     * @return boolean wether the rider is in the team
+     * @see cycling.Rider
+     */
     public boolean containsRider(Rider riderToFind) {
         // try find the rider using findRider function
         // if the function throws an IDNotRecognisedException exception,
@@ -77,7 +140,11 @@ public class Team {
         return true;
     } 
 
-    // TODO
+    /**
+     * Rider toString
+     * 
+     * @return a formatted string with relevent rider data
+     */
     public String toString() {
         return "Team[";
     }
