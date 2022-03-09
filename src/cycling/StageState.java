@@ -4,7 +4,7 @@ package cycling;
  * This enum is used to represent the state of the stage.
  * 
  * @author Ethan Hofton
- * @author Jon Tau
+ * @author Jon Tao
  * @version 1.0
  *
  */

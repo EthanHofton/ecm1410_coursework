@@ -5,7 +5,7 @@ package cycling;
  * A special case of {@code Segment} where the type is {@code SegmentType.SPRINT}
  * 
  * @auther Ethan Hofton
- * @auther Jon Tau
+ * @auther Jon Tao
  * @version 1.0
  * @see cycling.Segment
  * 

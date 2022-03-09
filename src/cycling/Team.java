@@ -7,7 +7,7 @@ import java.util.ArrayList;
  * Team class stores team ID and data relavent to team
  * 
  * @author Ethan Hofton
- * @author Jon Tau
+ * @author Jon Tao
  * @version 1.0
  * 
  */

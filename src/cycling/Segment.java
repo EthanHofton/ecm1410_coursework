@@ -5,7 +5,7 @@ package cycling;
  * climb segemnts and sprint segments
  * 
  * @auther Ethan Hofton
- * @auther Jon Tau
+ * @auther Jon Tao
  * @version 1.0
  */
 public class Segment {
@@ -75,17 +75,7 @@ public class Segment {
      * @return boolean of wether the segment is a climb or not
      */
     boolean isClimb() {
-        switch (type) {
-            case C1:
-            case C2:
-            case C3:
-            case C4:
-            case HC:
-                return true;
-            case SPRINT:
-                return false;
-        }
-        return false;
+        return !isSprint();
     }
 
     /**
@@ -94,7 +84,7 @@ public class Segment {
      * @return boolean of wether the segment is a sprint or not
      */
     boolean isSprint() {
-        return !isClimb();
+        return type == SegmentType.SPRINT;
     }
 
     /**

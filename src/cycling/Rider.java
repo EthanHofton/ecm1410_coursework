@@ -4,7 +4,7 @@ package cycling;
  * The rider class. Stores rider id and other data relevent to the rider
  * 
  * @author Ethan Hofton
- * @author Jon Tau
+ * @author Jon Tao
  * @version 1.0
  */
 public class Rider {
@@ -67,6 +67,22 @@ public class Rider {
      */
     public int getRiderYearOfBirth() {
         return riderYearOfBirth;
+    }
+
+    /**
+     * sums the rank points and sprint points for a rider and given stage
+     * 
+     * @param stage the stage the rider accumlated points for
+     * @param rank the rank the rider got
+     * @return the total points accumlated for the given stage
+     */
+    public int getPointsInStage(Stage stage, int rank) {
+        int points = 0;
+
+        points += stage.pointsForRank(rank);
+        points += stage.pointsForIntermediateSprints(this);
+
+        return points;
     }
 
     /**

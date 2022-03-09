@@ -5,12 +5,14 @@ import java.time.Duration;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
 
 /**
  * Cycling Portal implaments CyclingPortalInterface class
  *  
  * @author Ethan Hofton
- * @atuher Jon Tau
+ * @atuher Jon Tao
  * @version 1.0
  */
 public class CyclingPortal implements CyclingPortalInterface {
@@ -305,7 +307,7 @@ public class CyclingPortal implements CyclingPortalInterface {
 
         // throws InvalidStageStateException
         if (stage.getStageState() == StageState.WAITING_FOR_RESULTS) {
-            throw new InvalidStageStateException("Stage cannot be removed while waiting for results");
+            throw new InvalidStageStateException("Stage cannot be added while waiting for results");
         }
 
         if (stage.getType() == StageType.TT) {
@@ -509,12 +511,10 @@ public class CyclingPortal implements CyclingPortalInterface {
         Stage stage = findStage(stageId);
         
         // check rider does not have duplicate result
-        Race race = stage.getRace();
-        for (int i = 0; i < race.getResults().size(); i++) {
-            Stage currentStage = race.getResults().get(i).getStage();
-            Rider currentRider = race.getResults().get(i).getRider();
-            if (stage.getStageId() == currentStage.getStageId() && currentRider == rider) {
-                throw new DuplicatedResultException("Each rider can have only one result per stage");
+        for (int i = 0; i < stage.getResults().size(); i++) {
+            if (stage.getResults().get(i).getRider() == rider) {
+                // duplicate found
+                throw new DuplicatedResultException("Stage allready has results for rider");
             }
         }
 
@@ -530,8 +530,7 @@ public class CyclingPortal implements CyclingPortalInterface {
 
         Results result = new Results(stage, rider, checkpoints);
 
-        race.addResults(result);
-        
+        stage.addResults(result);
     }
 
     /**
@@ -546,12 +545,12 @@ public class CyclingPortal implements CyclingPortalInterface {
         // throws IDNotRecognisedException
         Rider rider = findRider(riderId);
 
-        Race race = stage.getRace();
         Results riderResult = null;
 
-        for (int i = 0; i < race.getResults().size(); i++) {
-            if (rider == race.getResults().get(i).getRider() && stage == race.getResults().get(i).getStage()) {
-                riderResult = race.getResults().get(i);
+        // find rider results
+        for (int i = 0; i < stage.getResults().size(); i++) {
+            if (rider == stage.getResults().get(i).getRider()) {
+                riderResult = stage.getResults().get(i);
             }
         }
 
@@ -564,9 +563,7 @@ public class CyclingPortal implements CyclingPortalInterface {
             riderResults[i] = riderResult.getTimes()[i];
         }
 
-        Duration eplapsedTime = Duration.between(riderResults[0], riderResults[riderResult.getTimes().length-1]);
-        LocalTime eTime = LocalTime.ofNanoOfDay(eplapsedTime.toNanos());
-        riderResults[riderResult.getTimes().length] = eTime;
+        riderResults[riderResult.getTimes().length] = riderResult.calculateElapsedTime();
 
         return riderResults;
     }
@@ -576,8 +573,27 @@ public class CyclingPortal implements CyclingPortalInterface {
      */
     @Override
     public LocalTime getRiderAdjustedElapsedTimeInStage(int stageId, int riderId) throws IDNotRecognisedException {
-        // TODO Auto-generated method stub
-        return null;
+
+        // throws IDNotRecognisedException
+        Stage stage = findStage(stageId);
+
+        // throws IDNotRecognisedException
+        Rider rider = findRider(riderId);
+        
+        Results riderResult = null;
+
+        // find rider results
+        for (int i = 0; i < stage.getResults().size(); i++) {
+            if (rider == stage.getResults().get(i).getRider()) {
+                riderResult = stage.getResults().get(i);
+            }
+        }
+
+        if (riderResult == null) {
+            return null;
+        }
+
+        return riderResult.calculateAdjustedElapsedTime();
     }
 
     /**
@@ -585,8 +601,28 @@ public class CyclingPortal implements CyclingPortalInterface {
      */
     @Override
     public void deleteRiderResultsInStage(int stageId, int riderId) throws IDNotRecognisedException {
-        // TODO Auto-generated method stub
         
+        // throws IDNOtRecognisedException
+        Stage stage = findStage(stageId);
+
+        // throws IDNOtRecognisedException
+        Rider rider = findRider(riderId);
+
+        Results riderResult = null;
+
+        // find rider results
+        for (int i = 0; i < stage.getResults().size(); i++) {
+            if (rider == stage.getResults().get(i).getRider()) {
+                riderResult = stage.getResults().get(i);
+            }
+        }
+
+        if (riderResult == null) {
+            return;
+        }
+
+        // remove rider result from stage
+        stage.removeResults(riderResult);
     }
 
     /**
@@ -594,8 +630,23 @@ public class CyclingPortal implements CyclingPortalInterface {
      */
     @Override
     public int[] getRidersRankInStage(int stageId) throws IDNotRecognisedException {
-        // TODO Auto-generated method stub
-        return null;
+        
+        // throws IDNotRecognisedException
+        Stage stage = findStage(stageId);
+
+        Results[] rankedResults = new Results[stage.getResults().size()];
+        for (int i = 0; i < rankedResults.length; i++) {
+            rankedResults[i] = stage.getResults().get(i);
+        }
+
+        Arrays.sort(rankedResults, new ResultsElapsedTimeComparator());
+
+        int[] riderRanks = new int[rankedResults.length];
+        for (int i = 0; i < riderRanks.length; i++) {
+            riderRanks[i] = rankedResults[i].getRider().getRiderId();
+        }
+
+        return riderRanks;
     }
 
     /**
@@ -603,8 +654,27 @@ public class CyclingPortal implements CyclingPortalInterface {
      */
     @Override
     public LocalTime[] getRankedAdjustedElapsedTimesInStage(int stageId) throws IDNotRecognisedException {
-        // TODO Auto-generated method stub
-        return null;
+
+        // throws IDNotRecognisedException
+        Stage stage = findStage(stageId);
+
+        // throws IDNotRecognisedException
+        int[] ridersRanked = getRidersRankInStage(stageId);
+
+        LocalTime[] riderAdjustedElapsedTimes = new LocalTime[ridersRanked.length];
+
+        for (int i = 0; i < riderAdjustedElapsedTimes.length; i++) {
+            // get rider
+            Rider rider = findRider(ridersRanked[i]);
+            for (int x = 0; x < stage.getResults().size(); x++) {
+                if (stage.getResults().get(x).getRider() == rider) {
+                    riderAdjustedElapsedTimes[i] = stage.getResults().get(x).calculateAdjustedElapsedTime();
+                    continue;
+                }
+            }
+        }
+
+        return riderAdjustedElapsedTimes;
     }
 
     /**
@@ -612,8 +682,22 @@ public class CyclingPortal implements CyclingPortalInterface {
      */
     @Override
     public int[] getRidersPointsInStage(int stageId) throws IDNotRecognisedException {
-        // TODO Auto-generated method stub
-        return null;
+        // throws IDNotRecognisedException
+        Stage stage = findStage(stageId);
+
+        // throws IDNotRecognisedException
+        int[] ridersRanked = getRidersRankInStage(stageId);
+
+        int[] riderPoints = new int[ridersRanked.length];
+
+        for (int i = 0; i < riderPoints.length; i++) {
+            // get rider
+            Rider rider = findRider(ridersRanked[i]);
+
+            riderPoints[i] = rider.getPointsInStage(stage, i+1);
+        }
+
+        return riderPoints;
     }
 
     /**
@@ -621,8 +705,22 @@ public class CyclingPortal implements CyclingPortalInterface {
      */
     @Override
     public int[] getRidersMountainPointsInStage(int stageId) throws IDNotRecognisedException {
-        // TODO Auto-generated method stub
-        return null;
+        // throws IDNotRecognisedException
+        Stage stage = findStage(stageId);
+
+        // throws IDNotRecognisedException
+        int[] ridersRanked = getRidersRankInStage(stageId);
+
+        int[] riderPoints = new int[ridersRanked.length];
+
+        for (int i = 0; i < riderPoints.length; i++) {
+            // get rider
+            Rider rider = findRider(ridersRanked[i]);
+
+            riderPoints[i] = stage.pointsForMountainClassification(rider);
+        }
+
+        return riderPoints;
     }
 
     /**

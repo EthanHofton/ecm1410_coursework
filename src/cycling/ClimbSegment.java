@@ -5,7 +5,7 @@ package cycling;
  * climbing segment.
  * 
  * @author Ethan Hofton
- * @atuher Jon Tau
+ * @atuher Jon Tao
  * @version 1.0
  * 
  */
@@ -67,6 +67,142 @@ public class ClimbSegment extends Segment {
     @Override
     boolean isSprint() {
         return false;
+    }
+
+    /**
+     * Calculates the points mountain points for the segment
+     * Data from Figure 2 in coursework spesification
+     * 
+     * @param rank the rank of the rider
+     * @return the points the rider gets for the given rank
+     */
+    public int mountainPoints(int rank) {
+        switch (type) {
+            case C1:
+                return pointsFor1C(rank);
+            case C2:
+                return pointsFor2C(rank);
+            case C3:
+                return pointsFor3C(rank);
+            case C4:
+                return pointsFor4C(rank);
+            case HC:
+                return pointsForHC(rank);
+            default:
+                return 0;
+        }
+    }
+
+    /**
+     * Calculates the points for HC Mountain segment
+     * Data from Figure 2 in coursework spesification
+     * 
+     * @param rank the rank of the rider
+     * @return the points the rider gets for the given rank
+     */
+    static public int pointsForHC(int rank) {
+        switch (rank) {
+        case 1:
+            return 20;
+        case 2:
+            return 15;
+        case 3:
+            return 12;
+        case 4:
+            return 10;
+        case 5:
+            return 8;
+        case 6:
+            return 6;
+        case 7:
+            return 4;
+        case 8:
+            return 2;
+        default:
+            return 0;
+        }
+    }
+
+    /**
+     * Calculates the points for 1C Mountain segment
+     * Data from Figure 2 in coursework spesification
+     * 
+     * @param rank the rank of the rider
+     * @return the points the rider gets for the given rank
+     */
+    static public int pointsFor1C(int rank) {
+        switch (rank) {
+        case 1:
+            return 10;
+        case 2:
+            return 8;
+        case 3:
+            return 6;
+        case 4:
+            return 4;
+        case 5:
+            return 2;
+        case 6:
+            return 1;
+        default:
+            return 0;
+        }
+    }
+
+    /**
+     * Calculates the points for 2C Mountain segment
+     * Data from Figure 2 in coursework spesification
+     * 
+     * @param rank the rank of the rider
+     * @return the points the rider gets for the given rank
+     */
+    static public int pointsFor2C(int rank) {
+        switch (rank) {
+        case 1:
+            return 5;
+        case 2:
+            return 3;
+        case 3:
+            return 2;
+        case 4:
+            return 1;
+        default:
+            return 0;
+        }
+    }
+
+    /**
+     * Calculates the points for 3C Mountain segment
+     * Data from Figure 2 in coursework spesification
+     * 
+     * @param rank the rank of the rider
+     * @return the points the rider gets for the given rank
+     */
+    static public int pointsFor3C(int rank) {
+        switch (rank) {
+        case 1:
+            return 2;
+        case 2:
+            return 1;
+        default:
+            return 0;
+        }
+    }
+
+    /**
+     * Calculates the points for 4C Mountain segment
+     * Data from Figure 2 in coursework spesification
+     * 
+     * @param rank the rank of the rider
+     * @return the points the rider gets for the given rank
+     */
+    static public int pointsFor4C(int rank) {
+        switch (rank) {
+        case 1:
+            return 1;
+        default:
+            return 0;
+        }
     }
 
     /**

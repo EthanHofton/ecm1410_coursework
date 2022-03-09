@@ -1,12 +1,14 @@
 package cycling;
 
+import java.time.Duration;
 import java.time.LocalTime;
+import java.util.Arrays;
 
 /**
  * Class to store result data
  * 
  * @author Ethan Hofton
- * @atuher Jon Tau
+ * @atuher Jon Tao
  * @version 1.0
  */
 public class Results {
@@ -51,6 +53,56 @@ public class Results {
      */
     public Rider getRider() {
         return rider;
+    }
+
+    /**
+     * Calculate result elapsed time
+     * 
+     * @return elapsed time of the result
+     */
+    public LocalTime calculateElapsedTime() {
+        return calculateTimeToSegment(times.length - 1);
+    }
+
+    /**
+     * Calculate result adjusted elapsed time
+     * 
+     * @return the adjusted elspaed time of the result
+     */
+    public LocalTime calculateAdjustedElapsedTime() {
+        
+        Results[] elapsedTimes = new Results[stage.getResults().size()];
+        for (int i = 0; i < stage.getResults().size(); i++) {
+            elapsedTimes[i] = stage.getResults().get(i);
+        }
+
+        Arrays.sort(elapsedTimes, new ResultsElapsedTimeComparator());
+
+        LocalTime base = elapsedTimes[0].calculateElapsedTime();
+        for (int i = 0; i < elapsedTimes.length; i++) {
+
+            if (elapsedTimes[i] == this) {
+                return base;
+            }
+
+            Duration diff = Duration.between(elapsedTimes[i].calculateElapsedTime(), elapsedTimes[i+1].calculateElapsedTime());
+            if (diff.toMillis() > 1e+3) {
+                base = elapsedTimes[i+1].calculateElapsedTime();
+            }
+        }
+
+        return null;
+    }
+
+    /**
+     * calculates the time to given sigement
+     * 
+     * @param index the index of the segment in {@code times} array
+     * @return the {@code LocalTime} duration between the two times
+     */
+    LocalTime calculateTimeToSegment(int index) {
+        Duration eplapsedTime = Duration.between(times[0], times[index]);
+        return LocalTime.ofNanoOfDay(eplapsedTime.toNanos());
     }
 
     /**

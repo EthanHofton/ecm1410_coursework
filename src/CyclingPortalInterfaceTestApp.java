@@ -50,14 +50,26 @@ public class CyclingPortalInterfaceTestApp {
         int stage1 = portal.addStageToRace(race1, "Stage1", "Stage1", 23.1, LocalDateTime.now(), StageType.FLAT);
         int team1 = portal.createTeam("team1", "Test team");
         int rider1 = portal.createRider(team1, "Ethan", 2003);
+        int rider2 = portal.createRider(team1, "Ethan", 2003);
+        int rider3 = portal.createRider(team1, "Ethan", 2003);
+        int rider4 = portal.createRider(team1, "Ethan", 2003);
+        int rider5 = portal.createRider(team1, "Ethan", 2003);
 
-        int segment1 = portal.addCategorizedClimbToStage(stage1, Double.valueOf(12), SegmentType.C1, Double.valueOf(24), Double.valueOf(5));
+        int segment1 = portal.addCategorizedClimbToStage(stage1, Double.valueOf(16), SegmentType.HC, Double.valueOf(18), Double.valueOf(5));
+        int segment2 = portal.addCategorizedClimbToStage(stage1, Double.valueOf(16), SegmentType.HC, Double.valueOf(18), Double.valueOf(5));
 
         portal.concludeStagePreparation(stage1);
 
-        portal.registerRiderResultsInStage(stage1, rider1, LocalTime.parse("06:02:13"), LocalTime.parse("07:03:04"), LocalTime.parse("08:34:19"));
-        System.out.println(Arrays.toString(portal.getRiderResultsInStage(stage1, rider1)));
+        portal.registerRiderResultsInStage(stage1, rider1, LocalTime.parse("06:00:00"), LocalTime.parse("06:30:00"), LocalTime.parse("07:30:00"), LocalTime.parse("08:00:00.00"));
+        portal.registerRiderResultsInStage(stage1, rider2, LocalTime.parse("06:00:00"), LocalTime.parse("06:35:00"), LocalTime.parse("07:35:00"), LocalTime.parse("08:00:00.05"));
+        portal.registerRiderResultsInStage(stage1, rider3, LocalTime.parse("06:00:00"), LocalTime.parse("06:40:00"), LocalTime.parse("07:40:00"), LocalTime.parse("08:00:00.95"));
+        portal.registerRiderResultsInStage(stage1, rider4, LocalTime.parse("06:00:00"), LocalTime.parse("06:45:00"), LocalTime.parse("07:45:00"), LocalTime.parse("08:00:02.00"));
+        portal.registerRiderResultsInStage(stage1, rider5, LocalTime.parse("06:00:00"), LocalTime.parse("06:50:00"), LocalTime.parse("07:20:00"), LocalTime.parse("08:00:06.00"));
 
+        System.out.println(Arrays.toString(portal.getRidersRankInStage(stage1)));
+        System.out.println(Arrays.toString(portal.getRankedAdjustedElapsedTimesInStage(stage1)));
+        System.out.println(Arrays.toString(portal.getRidersPointsInStage(stage1)));
+        System.out.println(Arrays.toString(portal.getRidersMountainPointsInStage(stage1)));
 	}
 
 }
