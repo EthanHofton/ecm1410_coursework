@@ -1,12 +1,19 @@
 package cycling;
 
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
 import java.time.Duration;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collections;
+import java.util.Comparator;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 /**
  * Cycling Portal implaments CyclingPortalInterface class
@@ -728,8 +735,16 @@ public class CyclingPortal implements CyclingPortalInterface {
      */
     @Override
     public void eraseCyclingPortal() {
-        // TODO Auto-generated method stub
-        
+        // clear cycling portal
+        teams.clear();
+        races.clear();
+
+        // reset counters
+        Race.resetCounter();
+        Rider.resetCounter();
+        Segment.resetCounter();
+        Stage.resetCounter();
+        Team.resetCounter();
     }
 
     /**
@@ -737,8 +752,9 @@ public class CyclingPortal implements CyclingPortalInterface {
      */
     @Override
     public void saveCyclingPortal(String filename) throws IOException {
-        // TODO Auto-generated method stub
-        
+        ObjectOutputStream ostream = new ObjectOutputStream(new FileOutputStream(filename));
+        ostream.writeObject(this);
+        ostream.close();
     }
 
     /**
@@ -746,8 +762,15 @@ public class CyclingPortal implements CyclingPortalInterface {
      */
     @Override
     public void loadCyclingPortal(String filename) throws IOException, ClassNotFoundException {
-        // TODO Auto-generated method stub
-        
+        ObjectInputStream istream = new ObjectInputStream(new FileInputStream(filename));
+        Object portalObject = istream.readObject();
+        if (!(portalObject instanceof CyclingPortal)) {
+            // throw exceiption
+        }
+        CyclingPortal portal = (CyclingPortal)portalObject;
+        this.races = portal.races;
+        this.teams = portal.teams;
+        istream.close();
     }
 
     /**
@@ -755,8 +778,23 @@ public class CyclingPortal implements CyclingPortalInterface {
      */
     @Override
     public void removeRaceByName(String name) throws NameNotRecognisedException {
-        // TODO Auto-generated method stub
+        Race race = null;
+
+        for (int i = 0; i < races.size(); i++) {
+            if (races.get(i).getName() == name) {
+                race = races.get(i);
+            }
+        }
+
+        if (race == null) {
+            // throw NameNotRecognisedException
+            throw new NameNotRecognisedException("Race is not found with name " + name);
+        }
         
+        races.remove(race);
+
+        // since stage is stored in race and segments and results are stored in stage
+        // deleting the race will also delete segments, results and stage
     }
 
     /**
@@ -764,8 +802,42 @@ public class CyclingPortal implements CyclingPortalInterface {
      */
     @Override
     public int[] getRidersGeneralClassificationRank(int raceId) throws IDNotRecognisedException {
-        // TODO Auto-generated method stub
-        return null;
+        // throws IDNotRecognisedException
+        Race race = findRace(raceId);
+        
+        for (int i = 0; i < race.getStages().size(); i++) {
+            if (race.getStages().get(i).getResults().size() == 0) {
+                return new int[0];
+            }
+        }
+        ArrayList<Results> results = new ArrayList<>();
+        for (int i = 0; i < race.getStages().size(); i++) {
+            for (int x = 0; x < race.getStages().get(i).getResults().size(); x++) {
+                results.add(race.getStages().get(i).getResults().get(x));
+            }
+        }
+
+        Map<Rider, LocalTime> timesMap = new HashMap<Rider, LocalTime>();
+        for (int i = 0; i < results.size(); i++) {
+            Rider currentRider = results.get(i).getRider();
+            if (timesMap.containsKey(currentRider)) {
+                long nanos = results.get(i).calculateAdjustedElapsedTime().toNanoOfDay();
+                LocalTime newTime = timesMap.get(currentRider).plusNanos(nanos);
+                timesMap.replace(currentRider, newTime);
+            } else {
+                timesMap.put(currentRider, results.get(i).calculateAdjustedElapsedTime());
+            }
+        }
+
+        ArrayList<Map.Entry<Rider, LocalTime>> sorted = new ArrayList<>(timesMap.entrySet());
+        sorted.sort(new ResultsAdjustedElapsedTimeCompatiror());
+
+        int orderedRiderIds[] = new int[sorted.size()];
+        for (int i = 0; i < orderedRiderIds.length; i++) {
+            orderedRiderIds[i] = sorted.get(i).getKey().getRiderId();
+        }
+
+        return orderedRiderIds;
     }
 
     /**

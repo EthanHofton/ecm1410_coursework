@@ -1,5 +1,6 @@
 package cycling;
 
+import java.io.Serializable;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -11,7 +12,7 @@ import java.util.Arrays;
  * @author Jon Tao
  * @version 1.0
  */
-public class Stage {
+public class Stage implements Serializable {
     private static int stageCount = 0;
     private int stageId;
     private Race race;
@@ -423,4 +424,12 @@ public class Stage {
             return 0;
         }
     }
+
+    /**
+     * Rest the static counter to set the ids
+     */
+    public static void resetCounter() {
+        stageCount = 0;
+    }
+
 }

@@ -1,5 +1,7 @@
 package cycling;
 
+import java.io.Serializable;
+
 /**
  * Segment class. Stores information common to both 
  * climb segemnts and sprint segments
@@ -8,7 +10,7 @@ package cycling;
  * @auther Jon Tao
  * @version 1.0
  */
-public class Segment {
+public class Segment implements Serializable {
     protected static int segmentCount;
     protected int segmentId;
     protected Stage stage;
@@ -85,6 +87,13 @@ public class Segment {
      */
     boolean isSprint() {
         return type == SegmentType.SPRINT;
+    }
+
+    /**
+     * Rest the static counter to set the ids
+     */
+    public static void resetCounter() {
+        segmentCount = 0;
     }
 
     /**

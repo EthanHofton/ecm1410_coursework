@@ -1,5 +1,6 @@
 package cycling;
 
+import java.io.Serializable;
 import java.time.Duration;
 import java.time.LocalTime;
 import java.util.Arrays;
@@ -11,7 +12,7 @@ import java.util.Arrays;
  * @atuher Jon Tao
  * @version 1.0
  */
-public class Results {
+public class Results implements Serializable {
     private Stage stage;
     private Rider rider;
     private LocalTime[] times;

@@ -1,5 +1,6 @@
 package cycling;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 
 
@@ -11,7 +12,7 @@ import java.util.ArrayList;
  * @version 1.0
  * 
  */
-public class Team {
+public class Team implements Serializable {
     
     private static int teamCount = 0;
 
@@ -139,6 +140,13 @@ public class Team {
 
         return true;
     } 
+
+    /**
+     * Rest the static counter to set the ids
+     */
+    public static void resetCounter() {
+        teamCount = 0;
+    }
 
     /**
      * Rider toString

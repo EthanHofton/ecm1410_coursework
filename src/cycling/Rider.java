@@ -1,5 +1,7 @@
 package cycling;
 
+import java.io.Serializable;
+
 /**
  * The rider class. Stores rider id and other data relevent to the rider
  * 
@@ -7,7 +9,7 @@ package cycling;
  * @author Jon Tao
  * @version 1.0
  */
-public class Rider {
+public class Rider implements Serializable {
 
     private static int riderCount = 0;
 
@@ -83,6 +85,13 @@ public class Rider {
         points += stage.pointsForIntermediateSprints(this);
 
         return points;
+    }
+
+    /**
+     * Rest the static counter to set the ids
+     */
+    public static void resetCounter() {
+        riderCount = 0;
     }
 
     /**

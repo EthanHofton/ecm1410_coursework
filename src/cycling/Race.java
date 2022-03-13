@@ -1,5 +1,6 @@
 package cycling;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 
 /**
@@ -10,7 +11,7 @@ import java.util.ArrayList;
  * @atuher Jon Tao
  * @version 1.0
  */
-public class Race {
+public class Race implements Serializable {
     private static int raceCount = 0;
 
     private int raceId;
@@ -101,6 +102,13 @@ public class Race {
      */
     public boolean containsStage(Stage stage) {
         return stages.contains(stage);
+    }
+
+    /**
+     * Rest the static counter to set the ids
+     */
+    public static void resetCounter() {
+        raceCount = 0;
     }
 
     /**
