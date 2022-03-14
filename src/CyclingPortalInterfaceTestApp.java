@@ -62,6 +62,8 @@ public class CyclingPortalInterfaceTestApp {
         int segment1 = portal.addCategorizedClimbToStage(stage1, Double.valueOf(16), SegmentType.HC, Double.valueOf(18), Double.valueOf(5));
         int segment2 = portal.addCategorizedClimbToStage(stage1, Double.valueOf(16), SegmentType.HC, Double.valueOf(18), Double.valueOf(5));
 
+        int segment3 = portal.addCategorizedClimbToStage(stage2, Double.valueOf(16), SegmentType.HC, Double.valueOf(18), Double.valueOf(5));
+
         portal.concludeStagePreparation(stage1);
         portal.concludeStagePreparation(stage2);
 
@@ -71,16 +73,18 @@ public class CyclingPortalInterfaceTestApp {
         portal.registerRiderResultsInStage(stage1, rider4, LocalTime.parse("06:00:00"), LocalTime.parse("06:45:00"), LocalTime.parse("07:45:00"), LocalTime.parse("08:00:02.00"));
         portal.registerRiderResultsInStage(stage1, rider5, LocalTime.parse("06:00:00"), LocalTime.parse("06:50:00"), LocalTime.parse("07:20:00"), LocalTime.parse("08:00:06.00"));
 
-        portal.registerRiderResultsInStage(stage2, rider1, LocalTime.parse("06:00:00"), LocalTime.parse("08:00:10.00"));
-        portal.registerRiderResultsInStage(stage2, rider2, LocalTime.parse("06:00:00"), LocalTime.parse("08:00:00.00"));
-        portal.registerRiderResultsInStage(stage2, rider3, LocalTime.parse("06:00:00"), LocalTime.parse("08:00:00.95"));
-        portal.registerRiderResultsInStage(stage2, rider4, LocalTime.parse("06:00:00"), LocalTime.parse("08:00:02.00"));
-        portal.registerRiderResultsInStage(stage2, rider5, LocalTime.parse("06:00:00"), LocalTime.parse("08:00:06.00"));
-
-        System.out.println(Arrays.toString(portal.getRidersRankInStage(stage2)));
-        System.out.println(Arrays.toString(portal.getRankedAdjustedElapsedTimesInStage(stage2)));
+        portal.registerRiderResultsInStage(stage2, rider1, LocalTime.parse("06:00:00"), LocalTime.parse("07:00:00"), LocalTime.parse("08:00:10.00"));
+        portal.registerRiderResultsInStage(stage2, rider2, LocalTime.parse("06:00:00"), LocalTime.parse("07:00:10"), LocalTime.parse("08:00:00.00"));
+        portal.registerRiderResultsInStage(stage2, rider3, LocalTime.parse("06:00:00"), LocalTime.parse("07:00:20"), LocalTime.parse("08:00:00.95"));
+        portal.registerRiderResultsInStage(stage2, rider4, LocalTime.parse("06:00:00"), LocalTime.parse("07:00:30"), LocalTime.parse("08:00:02.00"));
+        portal.registerRiderResultsInStage(stage2, rider5, LocalTime.parse("06:00:00"), LocalTime.parse("07:00:40"), LocalTime.parse("08:00:06.00"));
         
-        System.out.println(Arrays.toString(portal.getRidersGeneralClassificationRank(race1)));
+        System.out.println("Riders general classification rank: " + Arrays.toString(portal.getRidersGeneralClassificationRank(race1)));
+        System.out.println("Riders general classification times: " + Arrays.toString(portal.getGeneralClassificationTimesInRace(race1)));
+        System.out.println("Riders points: " + Arrays.toString(portal.getRidersPointsInRace(race1)));
+        System.out.println("Riders points (ordered by id): " + Arrays.toString(portal.getRidersPointClassificationRank(race1)));
+        System.out.println("Riders mountain points: " + Arrays.toString(portal.getRidersMountainPointsInRace(race1)));
+        System.out.println("Riders mountain points (ordered by id): " + Arrays.toString(portal.getRidersMountainPointClassificationRank(race1)));
 	}
 
 }

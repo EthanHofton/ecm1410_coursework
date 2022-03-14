@@ -88,6 +88,16 @@ public class Rider implements Serializable {
     }
 
     /**
+     * returns the mountain points for that rider in the given stage
+     * 
+     * @param stage the stage the rider accumlated points for
+     * @return the total points accumlated for the given stage
+     */
+    public int getMountainPointsInStage(Stage stage) {
+        return stage.pointsForMountainClassification(this);
+    }
+
+    /**
      * Rest the static counter to set the ids
      */
     public static void resetCounter() {
