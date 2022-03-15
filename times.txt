@@ -1,0 +1,12 @@
+Student ID: 710030702 (Ethan) Weight: 50%
+Student ID: 710004744 (Johnathan) Weight: 50%
+
+Date: 13/02/22 Time: 17:00 Duration: 0.5h 710030702: OO Design 710004744: OO Design
+Date: 14/02/22 Time: 19:30 Duration: 003h 710030702: Driver 710004744: Observer
+Date: 17/02/22 Time: 13:30 Duration: 002h 710004744: Driver 710030702: Observer
+Date: 26/02/22 Time: 13:50 Duration: 002h 710030702: Driver 710004744: Observer
+Date: 04/03/22 Time: 13:50 Duration: 002h 710004744: Driver 710030702: Observer
+Date: 09/03/22 Time: 13:50 Duration: 003h 710030702: Driver 710004744: Observer
+Date: 11/03/22 Time: 13:50 Duration: 001h 710004744: Driver 710030702: Observer
+Date: 13/03/22 Time: 13:50 Duration: 001h 710030702: Driver 710004744: Observer
+Date: 14/03/22 Time: 13:50 Duration: 001h 710030702: Driver 710004744: Observer
