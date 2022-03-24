@@ -9,7 +9,7 @@ import java.util.Arrays;
  * Class to store result data
  * 
  * @author Ethan Hofton
- * @atuher Jon Tao
+ * @author Jon Tao
  * @version 1.0
  */
 public class Results implements Serializable {
@@ -27,11 +27,16 @@ public class Results implements Serializable {
      * @see cycling.Rider 
      */
     public Results(Stage stage, Rider rider, LocalTime... times) {
+        // set class attrbutes
         this.stage = stage;
         this.rider = rider;
+
+        // initalize times array
         this.times = new LocalTime[times.length];
 
+        // loop through all local times in times varargs
         for (int i = 0; i < this.times.length; i++) {
+            // set each time in times array
             this.times[i] = times[i];
         }
     }
@@ -62,6 +67,7 @@ public class Results implements Serializable {
      * @return elapsed time of the result
      */
     public LocalTime calculateElapsedTime() {
+        // calculate the time to the last segment (elapsed time)
         return calculateTimeToSegment(times.length - 1);
     }
 
@@ -71,27 +77,39 @@ public class Results implements Serializable {
      * @return the adjusted elspaed time of the result
      */
     public LocalTime calculateAdjustedElapsedTime() {
-        
+        // create an elapsed times array the size of all the result
         Results[] elapsedTimes = new Results[stage.getResults().size()];
+
+        // loop through each result in the stage
         for (int i = 0; i < stage.getResults().size(); i++) {
+            // set the result at each index
             elapsedTimes[i] = stage.getResults().get(i);
         }
 
+        // sort array using custtom comparitor ResultsElapsedTimeComparator
         Arrays.sort(elapsedTimes, new ResultsElapsedTimeComparator());
 
+        // create a base to store the result time
         LocalTime base = elapsedTimes[0].calculateElapsedTime();
-        for (int i = 0; i < elapsedTimes.length; i++) {
 
+        // loop through each result
+        for (int i = 0; i < elapsedTimes.length; i++) {
+            // if the current result is equal to this result, return the base reuslt
             if (elapsedTimes[i] == this) {
                 return base;
             }
 
+            // calculate the differance between the current elapsed time and the next
             Duration diff = Duration.between(elapsedTimes[i].calculateElapsedTime(), elapsedTimes[i+1].calculateElapsedTime());
+            
+            // check if the time differance is grater then a second
             if (diff.toMillis() > 1e+3) {
+                // if the differance is grater then a second, set the base to the next elapsed time
                 base = elapsedTimes[i+1].calculateElapsedTime();
             }
         }
 
+        // if no base was returned by now, return null
         return null;
     }
 
@@ -102,7 +120,10 @@ public class Results implements Serializable {
      * @return the {@code LocalTime} duration between the two times
      */
     LocalTime calculateTimeToSegment(int index) {
+        // calculate the duration between the first time and the time at the given index
         Duration eplapsedTime = Duration.between(times[0], times[index]);
+
+        // return this value as a local time
         return LocalTime.ofNanoOfDay(eplapsedTime.toNanos());
     }
 

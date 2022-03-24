@@ -6,8 +6,8 @@ import java.io.Serializable;
  * Segment class. Stores information common to both 
  * climb segemnts and sprint segments
  * 
- * @auther Ethan Hofton
- * @auther Jon Tao
+ * @author Ethan Hofton
+ * @author Jon Tao
  * @version 1.0
  */
 public class Segment implements Serializable {
@@ -26,8 +26,11 @@ public class Segment implements Serializable {
      * @see cycling.Stage
      * @see cycling.SegmentType
      */
-    public Segment(Stage stage, double location, SegmentType type){
+    public Segment(Stage stage, double location, SegmentType type) {
+        // set segment id and increment segment count
         this.segmentId = segmentCount++;
+
+        // set the class attributes
         this.stage = stage;
         this.location = location;
         this.type = type;
@@ -93,15 +96,7 @@ public class Segment implements Serializable {
      * Rest the static counter to set the ids
      */
     public static void resetCounter() {
+        // reset the static segment counter
         segmentCount = 0;
-    }
-
-    /**
-     * toString of Segment
-     * 
-     * @return formatted string containg relavent segment data
-     */
-    public String toString() {
-        return "Segment[stage="+stage+",location="+location+",type="+type+"]";
     }
 }

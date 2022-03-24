@@ -19,6 +19,7 @@ public class ResultsMountainTimeCompatoror implements Comparator<Results> {
      * @param pos the position the segment is in the checkpoint times
      */
     public ResultsMountainTimeCompatoror(int pos) {
+        // set class attrivutes
         this.pos = pos;
     }
 
@@ -31,6 +32,7 @@ public class ResultsMountainTimeCompatoror implements Comparator<Results> {
      */
     @Override
     public int compare(Results result1, Results result2) {
+        // compare 2 results at a cetrain position using LocalTime.compareTo
         return result1.getTimes()[pos].compareTo(result2.getTimes()[pos]);
     }
 }

@@ -27,8 +27,10 @@ public class Rider implements Serializable {
      * @see cycling.Team
      */
     public Rider(Team team, String riderName, int riderYearOfBirth) {
+        // set rider id and increment rider count
         this.riderId = riderCount++;
         
+        // set rider class attributes
         this.riderName = riderName;
         this.riderYearOfBirth = riderYearOfBirth;
         this.riderTeam = team;
@@ -79,9 +81,13 @@ public class Rider implements Serializable {
      * @return the total points accumlated for the given stage
      */
     public int getPointsInStage(Stage stage, int rank) {
+        // initalize the points
         int points = 0;
 
+        // add the rank points
         points += stage.pointsForRank(rank);
+
+        // add the intermidiate sprint points
         points += stage.pointsForIntermediateSprints(this);
 
         return points;
@@ -94,6 +100,7 @@ public class Rider implements Serializable {
      * @return the total points accumlated for the given stage
      */
     public int getMountainPointsInStage(Stage stage) {
+        // return the mountain points for this rider
         return stage.pointsForMountainClassification(this);
     }
 
@@ -101,15 +108,7 @@ public class Rider implements Serializable {
      * Rest the static counter to set the ids
      */
     public static void resetCounter() {
+        // reset static rider counter
         riderCount = 0;
-    }
-
-    /**
-     * To string method for the rider
-     * 
-     * @return formatted string with rider information
-     */
-    public String toString() {
-        return "Rider[riderId="+riderId+",riderTeam="+riderTeam+",riderName="+riderName+",riderYearOfBirth="+riderYearOfBirth+"]";
     }
 }

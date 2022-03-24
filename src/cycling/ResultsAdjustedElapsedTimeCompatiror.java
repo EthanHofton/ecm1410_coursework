@@ -21,6 +21,7 @@ public class ResultsAdjustedElapsedTimeCompatiror implements Comparator<Map.Entr
      */
     @Override
     public int compare(Map.Entry<Rider,LocalTime> result1, Map.Entry<Rider,LocalTime> result2) {
+        // compare the value of each entry using LocalTime.compareTo
         return result1.getValue().compareTo(result2.getValue());
     }
 }

@@ -8,7 +8,7 @@ import java.util.ArrayList;
  * to the race
  * 
  * @author Ethan Hofton
- * @atuher Jon Tao
+ * @author Jon Tao
  * @version 1.0
  */
 public class Race implements Serializable {
@@ -26,9 +26,14 @@ public class Race implements Serializable {
      * @param description the description of the race
      */
     public Race(String name, String description) { 
+        // set the race id and increment the static race counter
         this.raceId = raceCount++;
+
+        // set the rest of the class attributes
         this.name = name;
         this.description = description;
+
+        // initalize stages array list
         this.stages = new ArrayList<>();
     }
 
@@ -76,6 +81,7 @@ public class Race implements Serializable {
      * @see cycling.Stage
      */
     public void addStage(Stage stage) {
+        // add stage to stages array list
         stages.add(stage);
     }
 
@@ -87,9 +93,12 @@ public class Race implements Serializable {
      * @see cycling.Stage
      */
     public void removeStage(Stage stage) throws IDNotRecognisedException {
+        // check if stages contains stage to remove
         if (!stages.contains(stage)) {
+            // if stages array list does not contain a stage, throw IDNotRecognisedException
             throw new IDNotRecognisedException("stage does not exist in race with Id '"+raceId+"'");
         }
+        // remove stage from stages array list
         stages.remove(stage);
     }
 
@@ -101,6 +110,7 @@ public class Race implements Serializable {
      * @see cycling.Stage
      */
     public boolean containsStage(Stage stage) {
+        // return weather stages contains array list
         return stages.contains(stage);
     }
 
@@ -108,15 +118,7 @@ public class Race implements Serializable {
      * Rest the static counter to set the ids
      */
     public static void resetCounter() {
+        // reset static race counte to zero
         raceCount = 0;
-    }
-
-    /**
-     * Class toString
-     * 
-     * @return a formatted string with class detials
-     */
-    public String toString() {
-        return "Race[raceId="+raceId+"name="+name+",description="+description+"]";
     }
 }

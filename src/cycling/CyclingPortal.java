@@ -18,7 +18,7 @@ import java.util.Map;
  * Cycling Portal implaments CyclingPortalInterface class
  *  
  * @author Ethan Hofton
- * @atuher Jon Tao
+ * @author Jon Tao
  * @version 1.0
  */
 public class CyclingPortal implements CyclingPortalInterface {
@@ -28,8 +28,6 @@ public class CyclingPortal implements CyclingPortalInterface {
 
     /**
      * CyclingPortal constructor initalises teams and races array list
-     * 
-     * @return nothing
      */
     public CyclingPortal() {
         // constructior to init lists
@@ -1068,42 +1066,80 @@ public class CyclingPortal implements CyclingPortalInterface {
      */
     @Override
     public int[] getRidersGeneralClassificationRank(int raceId) throws IDNotRecognisedException {
+        // find race in portal
         // throws IDNotRecognisedException
         Race race = findRace(raceId);
         
+        // if one of the stages does not have reaults, return an empty array
+        // loop through each stage in race
         for (int i = 0; i < race.getStages().size(); i++) {
+            // cheack if stage does not have results (results list empty)
             if (race.getStages().get(i).getResults().size() == 0) {
+                // return empty array
                 return new int[0];
             }
         }
 
+        // initalize an array list of results
         ArrayList<Results> results = new ArrayList<>();
+
+        // loop through each stage in the race
         for (int i = 0; i < race.getStages().size(); i++) {
+            // loop throgh each result in the race
             for (int x = 0; x < race.getStages().get(i).getResults().size(); x++) {
+                // add result to results array list
                 results.add(race.getStages().get(i).getResults().get(x));
             }
         }
 
+        // init a hash map to pair up the rider with there result
         Map<Rider, LocalTime> timesMap = new HashMap<Rider, LocalTime>();
+
+        // loop through all results
         for (int i = 0; i < results.size(); i++) {
+            // store the current rider
             Rider currentRider = results.get(i).getRider();
+
+            // check weather the rider has allreayd been entered into the hash map
             if (timesMap.containsKey(currentRider)) {
+                // if allready added, add the result adjusted elapsed time to the value allready
+                // in the hash map
+
+                // calculate the ammount of nannos the of the adjusted elapsed time
                 long nanos = results.get(i).calculateAdjustedElapsedTime().toNanoOfDay();
+
+                // add the nannos to the old value in the hash map
                 LocalTime newTime = timesMap.get(currentRider).plusNanos(nanos);
+
+                // relpace the old value in hash map with new value
+                // (new value is old time + result time)
                 timesMap.replace(currentRider, newTime);
             } else {
+                // if the rider has not allready been entered into the hash map, 
+                // add the rider to the hash map paired with there adjusted elapsed time
                 timesMap.put(currentRider, results.get(i).calculateAdjustedElapsedTime());
             }
         }
 
+        // create an array list of map entrys
         ArrayList<Map.Entry<Rider, LocalTime>> sorted = new ArrayList<>(timesMap.entrySet());
+
+        // sort the array of map entrys using the custom comparotor ResultsAdjustedElapsedTimeCompatiror
+        // this comparotor comparse Map.Entry<Rider, LocalTime> by returning the differeance between
+        // the local times
         sorted.sort(new ResultsAdjustedElapsedTimeCompatiror());
 
+        // init array of rider ids, the size of all the riders in the portal
         int orderedRiderIds[] = new int[sorted.size()];
+
+        // loop through all the riders in the portal
         for (int i = 0; i < orderedRiderIds.length; i++) {
+            // add the riders id to the corrisponding index in the array
+            // since the id is from the sorted array, orderedRiderIds will be ordered too
             orderedRiderIds[i] = sorted.get(i).getKey().getRiderId();
         }
 
+        // return the list of ordered rider ids
         return orderedRiderIds;
     }
 
@@ -1112,42 +1148,79 @@ public class CyclingPortal implements CyclingPortalInterface {
      */
     @Override
     public LocalTime[] getGeneralClassificationTimesInRace(int raceId) throws IDNotRecognisedException {
+        // find race in portal
         // throws IDNotRecognisedException
         Race race = findRace(raceId);
         
+        // check if any of the results are empty
+        // loop through all the stages in the race
         for (int i = 0; i < race.getStages().size(); i++) {
+            // check if the results list for any stage is empty
             if (race.getStages().get(i).getResults().size() == 0) {
+                // if empty, return an empty local time array
                 return new LocalTime[0];
             }
         }
         
+        // initalize a new array list of results to store all the results for the race
         ArrayList<Results> results = new ArrayList<>();
+
+        // loop through each stage in the race
         for (int i = 0; i < race.getStages().size(); i++) {
+            // loop through eahc reuslt in the stage
             for (int x = 0; x < race.getStages().get(i).getResults().size(); x++) {
+                // add the result to the results list
                 results.add(race.getStages().get(i).getResults().get(x));
             }
         }
 
+        // initalize a hash map to pair together the riders and there times
         Map<Rider, LocalTime> timesMap = new HashMap<Rider, LocalTime>();
+
+        // loop through each result in the race
         for (int i = 0; i < results.size(); i++) {
+            // store the current rider
             Rider currentRider = results.get(i).getRider();
+
+            // check if the hash map allready contains an entry for the current rider
             if (timesMap.containsKey(currentRider)) {
+                // if the hash map contains an enrty for the rider,
+                // add the current results adjusted elapsed time to the value for the rider
+                // allready in the hash map
+
+                //calculate the adjusted elapsed time for the current result in nano seconds
                 long nanos = results.get(i).calculateAdjustedElapsedTime().toNanoOfDay();
+
+                // add the current results nano seconds to the riders current result
                 LocalTime newTime = timesMap.get(currentRider).plusNanos(nanos);
+
+                // replace the old time with the new time
                 timesMap.replace(currentRider, newTime);
             } else {
+                // if rider does not allreayd have a map entry
+                // add them into the hashmap paired with there time
                 timesMap.put(currentRider, results.get(i).calculateAdjustedElapsedTime());
             }
         }
 
+        // create an array list of all the map entrys
         ArrayList<Map.Entry<Rider, LocalTime>> sorted = new ArrayList<>(timesMap.entrySet());
+
+        // sort the map using the custom comparitor whitch compares map entrys based of 
+        // the differance between there LocalTimes
         sorted.sort(new ResultsAdjustedElapsedTimeCompatiror());
 
+        // create an array of localTimes the size of all the riders in the race
         LocalTime orderedTimes[] = new LocalTime[sorted.size()];
+
+        // loop throguh all the riders
         for (int i = 0; i < orderedTimes.length; i++) {
+            // set the array to the local time of the sorted lists value at the same index
+            // this means the ordered time list will also be sorted the same way the soreded array list is
             orderedTimes[i] = sorted.get(i).getValue();
         }
 
+        // return the array of ordered times
         return orderedTimes;
     }
 
@@ -1156,59 +1229,105 @@ public class CyclingPortal implements CyclingPortalInterface {
      */
     @Override
     public int[] getRidersPointsInRace(int raceId) throws IDNotRecognisedException {
+        // find race in portal
         // throws IDNotRecognisedException
         Race race = findRace(raceId);
         
+        // check if any of the results are empty
+        // loop through all the stages in the race
         for (int i = 0; i < race.getStages().size(); i++) {
+            // check if the results list for any stage is empty
             if (race.getStages().get(i).getResults().size() == 0) {
+                // if empty, return an empty local time array
                 return new int[0];
             }
         }
 
+        // initalize a new array list of results to store all the results for the race
         ArrayList<Results> results = new ArrayList<>();
+
+        // loop through each stage in the race
         for (int i = 0; i < race.getStages().size(); i++) {
+            // loop through eahc reuslt in the stage
             for (int x = 0; x < race.getStages().get(i).getResults().size(); x++) {
+                // add the result to the results list
                 results.add(race.getStages().get(i).getResults().get(x));
             }
         }
 
+        // initalize a hash map to pair together the riders and there times
         Map<Rider, LocalTime> timesMap = new HashMap<Rider, LocalTime>();
+
+        // loop through each result in the race
         for (int i = 0; i < results.size(); i++) {
+            // store the current rider
             Rider currentRider = results.get(i).getRider();
+
+            // check if the hash map allready contains an entry for the current rider
             if (timesMap.containsKey(currentRider)) {
+                // if the hash map contains an enrty for the rider,
+                // add the current results adjusted elapsed time to the value for the rider
+                // allready in the hash map
+
+                //calculate the adjusted elapsed time for the current result in nano seconds
                 long nanos = results.get(i).calculateAdjustedElapsedTime().toNanoOfDay();
+
+                // add the current results nano seconds to the riders current result
                 LocalTime newTime = timesMap.get(currentRider).plusNanos(nanos);
+
+                // replace the old time with the new time
                 timesMap.replace(currentRider, newTime);
             } else {
+                // if rider does not allreayd have a map entry
+                // add them into the hashmap paired with there time
                 timesMap.put(currentRider, results.get(i).calculateAdjustedElapsedTime());
             }
         }
 
+        // create an array list of all the map entrys
         ArrayList<Map.Entry<Rider, LocalTime>> sorted = new ArrayList<>(timesMap.entrySet());
+
+        // sort the map using the custom comparitor whitch compares map entrys based of 
+        // the differance between there LocalTimes
         sorted.sort(new ResultsAdjustedElapsedTimeCompatiror());
 
+        // init a new array the size of all the riders in the race
         int ridersPoints[] = new int[sorted.size()];
+        // loop through all the riders in the race
         for (int i = 0; i < ridersPoints.length; i++) {
+            // init there inital points to zero
             ridersPoints[i] = 0;
         }
 
         // for each rider, find the total points in all stages
+        // loop through each stage in the race
         for (int i = 0; i < race.getStages().size(); i++) {
+            // store the current stage
             Stage currentStage = race.getStages().get(i);
+
+            // get a list of all the riders rank in that stage
             int ridersRanks[] = getRidersRankInStage(currentStage.getStageId());
 
+            // loop through each riders rank
             for (int x = 0; x < ridersRanks.length; x++) {
+                // find the riders id at rank x
                 int id = ridersRanks[x];
+
+                // add one to rank (so person with rank 0 is actually 1st)
                 int rank = x + 1;
 
+                // loop through the ordered list of adjusted elapsed times and riders
                 for (int y = 0; y < sorted.size(); y++) {
+                    // check if the rider id in the sorted list matches the current rider
                     if (id == sorted.get(y).getKey().getRiderId()) {
+                        // add the points for that stage and rider to the riders points list
                         ridersPoints[y] += sorted.get(y).getKey().getPointsInStage(currentStage, rank);
                     }
                 }
             }
         }
 
+        // return the riders points
         return ridersPoints;
     }
 
@@ -1217,52 +1336,93 @@ public class CyclingPortal implements CyclingPortalInterface {
      */
     @Override
     public int[] getRidersMountainPointsInRace(int raceId) throws IDNotRecognisedException {
-       // throws IDNotRecognisedException
-       Race race = findRace(raceId);
-        
-       for (int i = 0; i < race.getStages().size(); i++) {
-           if (race.getStages().get(i).getResults().size() == 0) {
-               return new int[0];
-           }
-       }
+        // find race in portal
+        // throws IDNotRecognisedException
+        Race race = findRace(raceId);
 
-       ArrayList<Results> results = new ArrayList<>();
-       for (int i = 0; i < race.getStages().size(); i++) {
-           for (int x = 0; x < race.getStages().get(i).getResults().size(); x++) {
-               results.add(race.getStages().get(i).getResults().get(x));
-           }
-       }
+        // check if any of the results are empty
+        // loop through all the stages in the race
+        for (int i = 0; i < race.getStages().size(); i++) {
+            // check if the results list for any stage is empty
+            if (race.getStages().get(i).getResults().size() == 0) {
+                // if empty, return an empty local time array
+                return new int[0];
+            }
+        }
 
-       Map<Rider, LocalTime> timesMap = new HashMap<Rider, LocalTime>();
-       for (int i = 0; i < results.size(); i++) {
-           Rider currentRider = results.get(i).getRider();
-           if (timesMap.containsKey(currentRider)) {
-               long nanos = results.get(i).calculateAdjustedElapsedTime().toNanoOfDay();
-               LocalTime newTime = timesMap.get(currentRider).plusNanos(nanos);
-               timesMap.replace(currentRider, newTime);
-           } else {
-               timesMap.put(currentRider, results.get(i).calculateAdjustedElapsedTime());
-           }
-       }
+        // initalize a new array list of results to store all the results for the race
+        ArrayList<Results> results = new ArrayList<>();
 
-       ArrayList<Map.Entry<Rider, LocalTime>> sorted = new ArrayList<>(timesMap.entrySet());
-       sorted.sort(new ResultsAdjustedElapsedTimeCompatiror());
+        // loop through each stage in the race
+        for (int i = 0; i < race.getStages().size(); i++) {
+            // loop through eahc reuslt in the stage
+            for (int x = 0; x < race.getStages().get(i).getResults().size(); x++) {
+                // add the result to the results list
+                results.add(race.getStages().get(i).getResults().get(x));
+            }
+        }
 
-       int ridersPoints[] = new int[sorted.size()];
-       for (int i = 0; i < ridersPoints.length; i++) {
-           ridersPoints[i] = 0;
-       }
+        // initalize a hash map to pair together the riders and there times
+        Map<Rider, LocalTime> timesMap = new HashMap<Rider, LocalTime>();
 
-       // for each rider, find the total points in all stages
-       for (int i = 0; i < race.getStages().size(); i++) {
-           Stage currentStage = race.getStages().get(i);
+        // loop through each result in the race
+        for (int i = 0; i < results.size(); i++) {
+            // store the current rider
+            Rider currentRider = results.get(i).getRider();
 
+            // check if the hash map allready contains an entry for the current rider
+            if (timesMap.containsKey(currentRider)) {
+                // if the hash map contains an enrty for the rider,
+                // add the current results adjusted elapsed time to the value for the rider
+                // allready in the hash map
+
+                //calculate the adjusted elapsed time for the current result in nano seconds
+                long nanos = results.get(i).calculateAdjustedElapsedTime().toNanoOfDay();
+
+                // add the current results nano seconds to the riders current result
+                LocalTime newTime = timesMap.get(currentRider).plusNanos(nanos);
+
+                // replace the old time with the new time
+                timesMap.replace(currentRider, newTime);
+            } else {
+                // if rider does not allreayd have a map entry
+                // add them into the hashmap paired with there time
+                timesMap.put(currentRider, results.get(i).calculateAdjustedElapsedTime());
+            }
+        }
+
+        // create an array list of all the map entrys
+        ArrayList<Map.Entry<Rider, LocalTime>> sorted = new ArrayList<>(timesMap.entrySet());
+
+        // sort the map using the custom comparitor whitch compares map entrys based of 
+        // the differance between there LocalTimes
+        sorted.sort(new ResultsAdjustedElapsedTimeCompatiror());
+
+        // init a new array the size of all the riders in the race
+        int ridersPoints[] = new int[sorted.size()];
+
+        // loop through all the riders in the race
+        for (int i = 0; i < ridersPoints.length; i++) {
+            // init there inital points to zero
+            ridersPoints[i] = 0;
+        }
+
+        // for each rider, find the total points in all stages
+        // loop through each stage in the race
+        for (int i = 0; i < race.getStages().size(); i++) {
+            // store the current stage
+            Stage currentStage = race.getStages().get(i);
+
+            // loop through each rider in the sorted array
             for (int y = 0; y < sorted.size(); y++) {
+                // add the rider at y's mountain points to the points array
+                // points calculated using Rider.getMountainPointsInStage()
                 ridersPoints[y] += sorted.get(y).getKey().getMountainPointsInStage(currentStage);
-           }
-       }
+            }
+        }
 
-       return ridersPoints;
+        // return the riders mouinain points ordered by adjusted elapsed time
+        return ridersPoints;
     }
 
     /**
@@ -1270,27 +1430,45 @@ public class CyclingPortal implements CyclingPortalInterface {
      */
     @Override
     public int[] getRidersPointClassificationRank(int raceId) throws IDNotRecognisedException {
-        
+        // get riders ranks for race
         int riderIds[] = getRidersGeneralClassificationRank(raceId);
+
+        // get riders points for race
         int riderPoints[] = getRidersPointsInRace(raceId);
 
+        // create a map mapping rider to there points
         Map<Rider, Integer> pointsMap = new HashMap<Rider, Integer>();
+
+        // loop through each rider in the race
         for (int i = 0; i < riderIds.length; i++) {
+            // store the current rider
             Rider currentRider = findRider(riderIds[i]);
+            
+            // add the current rider to the hash map with there points in race
             pointsMap.put(currentRider, riderPoints[i]);
         }
 
+        // create an array list of map entrys
         ArrayList<Map.Entry<Rider, Integer>> sorted = new ArrayList<>(pointsMap.entrySet());
 
+        // sort the array list by comparing the points
+        // points are compared using a custom comparitor and annonamys function which returs the differance
+        // between the current result and the result after
+        // p2 - p1 in order to get reverce order (p1 - p2 for acending order)
         sorted.sort(Comparator.comparing(Map.Entry<Rider, Integer>::getValue, (p1, p2) -> {
             return p2 - p1;
         }));
 
+        // create an array to store the ids of all the riders
         int sortedIds[] = new int[riderIds.length];
+
+        // loop through all the riders in the sorted array
         for (int i = 0; i < sortedIds.length; i++) {
+            // store the riders id in the array matching the index of the sorted array
             sortedIds[i] = sorted.get(i).getKey().getRiderId();
         }
 
+        // return the sorted list (by points aquired) of rider ids
         return sortedIds;
     }
 
@@ -1299,26 +1477,45 @@ public class CyclingPortal implements CyclingPortalInterface {
      */
     @Override
     public int[] getRidersMountainPointClassificationRank(int raceId) throws IDNotRecognisedException {
+        // get riders ranks for race
         int riderIds[] = getRidersGeneralClassificationRank(raceId);
+        
+        // get riders mountain points for race
         int riderPoints[] = getRidersMountainPointsInRace(raceId);
 
+        // create a map mapping rider to there points
         Map<Rider, Integer> pointsMap = new HashMap<Rider, Integer>();
+
+        // loop through each rider in the race
         for (int i = 0; i < riderIds.length; i++) {
+            // store the current rider
             Rider currentRider = findRider(riderIds[i]);
+
+            // add the current rider to the hash map with there points in race
             pointsMap.put(currentRider, riderPoints[i]);
         }
 
+        // create an array list of map entrys
         ArrayList<Map.Entry<Rider, Integer>> sorted = new ArrayList<>(pointsMap.entrySet());
 
+        // sort the array list by comparing the points
+        // points are compared using a custom comparitor and annonamys function which returs the differance
+        // between the current result and the result after
+        // p2 - p1 in order to get reverce order (p1 - p2 for acending order)
         sorted.sort(Comparator.comparing(Map.Entry<Rider, Integer>::getValue, (p1, p2) -> {
             return p2 - p1;
         }));
 
+        // create an array to store the ids of all the riders
         int sortedIds[] = new int[riderIds.length];
+
+        // loop through all the riders in the sorted array
         for (int i = 0; i < sortedIds.length; i++) {
+            // store the riders id in the array matching the index of the sorted array
             sortedIds[i] = sorted.get(i).getKey().getRiderId();
         }
 
+        // return the sorted list (by points aquired) of rider ids
         return sortedIds;
     }
     

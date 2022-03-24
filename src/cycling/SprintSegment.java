@@ -4,8 +4,8 @@ package cycling;
  * extends {@link cycling.Segment}
  * A special case of {@code Segment} where the type is {@code SegmentType.SPRINT}
  * 
- * @auther Ethan Hofton
- * @auther Jon Tao
+ * @author Ethan Hofton
+ * @author Jon Tao
  * @version 1.0
  * @see cycling.Segment
  * 
@@ -20,6 +20,7 @@ public class SprintSegment extends Segment {
      * @see cycling.Stage
      */
     public SprintSegment(Stage stage, double location) {
+        // call segment constructor
         super(stage, location, SegmentType.SPRINT);
     }
 
@@ -43,15 +44,5 @@ public class SprintSegment extends Segment {
     @Override
     boolean isSprint() {
         return true;
-    }
-
-    /**
-     * SprintSegment toString
-     * 
-     * @return formatted string with relevent class data
-     */
-    @Override
-    public String toString() {
-        return "SprintSegment[stage="+stage+",location="+location+",type="+type+"]";
     }
 }

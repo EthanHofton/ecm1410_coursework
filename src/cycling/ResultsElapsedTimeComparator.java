@@ -20,6 +20,8 @@ public class ResultsElapsedTimeComparator implements Comparator<Results> {
      */
     @Override
     public int compare(Results result1, Results result2) {
+        // compare 2 results by there adjusted elapsed time
+        // using LocalTime.compareTo and Reuslt.calculateElapsedTime
         return result1.calculateElapsedTime().compareTo(result2.calculateElapsedTime());
     }
 }

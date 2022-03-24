@@ -39,7 +39,10 @@ public class Stage implements Serializable {
      * @see cycling.StageType
      */
     public Stage(Race race, String stageName, String description, double length, LocalDateTime startTime, StageType type) {
+        // set the stage id and increment the static stage counter
         this.stageId = stageCount++;
+
+        // set class attributes
         this.race = race;
         this.stageName = stageName;
         this.description = description;
@@ -48,7 +51,8 @@ public class Stage implements Serializable {
         this.type = type;
         this.stageState = StageState.STAGE_PREPERATION;
 
-        segments = new ArrayList<>();
+        // initalize the class array lists
+        this.segments = new ArrayList<>();
         this.results = new ArrayList<>();
     }
 
@@ -133,6 +137,7 @@ public class Stage implements Serializable {
      * @see cycling.Segment
      */
     public void addSegment(Segment segment) {
+        // add segment to segment array list
         this.segments.add(segment);
     }
 
@@ -143,6 +148,7 @@ public class Stage implements Serializable {
      * @see cycling.Segment
      */
     public void removeSegment(Segment segment) {
+        // remove segment from segment array list
         this.segments.remove(segment);
     }
 
@@ -163,10 +169,15 @@ public class Stage implements Serializable {
      * @throws InvalidStageStateException if the function is called twice
      */
     public void concludeStagePreparation() throws InvalidStageStateException {
+        // conculde stage preperation
+        // if stage has allready been conculded throw error
+        // check if stage type is allready waiting for results
         if (this.stageState == StageState.WAITING_FOR_RESULTS) {
+            // throw InvalidStageStateException if stage state is allready waitng for results
             throw new InvalidStageStateException("Stage is allready waiting for results");
         }
 
+        // set the stage state to waiting for resutls
         this.stageState = StageState.WAITING_FOR_RESULTS;
     }
 
@@ -177,6 +188,7 @@ public class Stage implements Serializable {
      * @see cycling.Results
      */
     public void addResults(Results result) {
+        // add result to resutls array list
         results.add(result);
     }
 
@@ -198,9 +210,13 @@ public class Stage implements Serializable {
      * @see cycling.Results
      */
     public void removeResults(Results result) throws IDNotRecognisedException {
+        // remove result from result array list
+        // check if result array contains result
         if (!results.contains(result)) {
+            // if the result array does not contain result, throw an IDNotRecognisedException
             throw new IDNotRecognisedException("result does not exist in race with Id '"+stageId+"'");
         }
+        // remove result
         results.remove(result);
     }
 
@@ -213,6 +229,8 @@ public class Stage implements Serializable {
      */
     public int pointsForRank(int rank) {
 
+        // return the points aquired for a riders given rank
+        // switch the stage type and return the appriotiate points based on the rank and stage type
         switch (this.type) {
             case FLAT:
                 return pointsForFlat(rank);
@@ -223,6 +241,7 @@ public class Stage implements Serializable {
             case TT:
                 return pointsForHMTTIT(rank);
             default:
+                // if the stage type is not as above, no points were aquered and return zero
                 return 0;
         }
     }
@@ -235,20 +254,31 @@ public class Stage implements Serializable {
      * @return the points the rider accumulated over the stage
      */
     public int pointsForIntermediateSprints(Rider rider) {
+        // initalize points to zero
         int points = 0;
 
+        // loop through all the segments in the stage
         for (int i = 0; i < segments.size(); i++) {
+            // check if the segment is a sprint segment
             if (segments.get(i).isSprint()) {
-
+                // create an array for all the results
                 Results[] rankedResults = new Results[getResults().size()];
+
+                // loop through all the results in the stage
                 for (int x = 0; x < rankedResults.length; x++) {
+                    // add the result to the results array
                     rankedResults[x] = getResults().get(x);
                 }
 
+                // sort the results array based on the elapsed time to the point
+                // sort using custom comparitor ResultsSegmentTimeCompatitor
                 Arrays.sort(rankedResults, new ResultsSegmentTimeCompatitor(i+1));
 
+                // loop through all the RANKED results
                 for (int x = 0; x < rankedResults.length; x++) {
+                    // if the result belongs to the rider
                     if (rankedResults[x].getRider() == rider) {
+                        // add the intermediat points to the sum
                         points += pointsForHMTTIT(x+1);
                         continue;
                     }
@@ -256,6 +286,7 @@ public class Stage implements Serializable {
             }
         }
 
+        // return the points aquered
         return points;
     }
 
@@ -267,22 +298,34 @@ public class Stage implements Serializable {
      */
     public int pointsForMountainClassification(Rider rider) {
 
+        // initalize points to zero
         int points = 0;
 
+        // loop through all the segments in the stage
         for (int i = 0; i < segments.size(); i++) {
+            // check if the segment is a climb
             if (segments.get(i).isClimb()) {
+                // if the segment is a climb, it is safe to upcase the segment to a climbsegment
                 ClimbSegment segment = (ClimbSegment)segments.get(i);
 
-                // throws IDNotRecognisedException
+                // create a new array to store all the results in the stage
                 Results[] rankedResults = new Results[getResults().size()];
+
+                // loop through each result in the stage
                 for (int x = 0; x < rankedResults.length; x++) {
+                    // add the result to the list of results
                     rankedResults[x] = getResults().get(x);
                 }
 
+                // sore the ranked results using custom compatiror ResultsMountainTimeCompatoror to sort based of 
+                // of the time at which the riders reached the segmenent finish
                 Arrays.sort(rankedResults, new ResultsMountainTimeCompatoror(i+1));
 
+                // loop through all the ranked results
                 for (int x = 0; x < rankedResults.length; x++) {
+                    // if the result belongs to the rider
                     if (rankedResults[x].getRider() == rider) {
+                        // add the mountian points for that segment to the riders sum
                         points += segment.mountainPoints(x+1);
                         continue;
                     }
@@ -290,6 +333,7 @@ public class Stage implements Serializable {
             }
         }
 
+        // return the points aquered
         return points;
     }
 
@@ -301,6 +345,8 @@ public class Stage implements Serializable {
      * @return the points the rider gets for the given rank
      */
     static public int pointsForFlat(int rank) {
+        // return the points aquered for the rank and if the stage type is flat
+        // add data is taken from Figure 1 in coursework spec
         switch (rank) {
         case 1:
             return 50;
@@ -345,6 +391,8 @@ public class Stage implements Serializable {
      * @return the points the rider gets for the given rank
      */
     static public int pointsForMediumMountain(int rank) {
+        // return the points aquered for the rank and if the stage type is medium
+        // add data is taken from Figure 1 in coursework spec
         switch (rank) {
         case 1:
             return 30;
@@ -389,6 +437,9 @@ public class Stage implements Serializable {
      * @return the points the rider gets for the given rank
      */
     static public int pointsForHMTTIT(int rank) {
+        // return the points aquered for the rank and if the stage type is high mountain, time trial or individual
+        // trail
+        // add data is taken from Figure 1 in coursework spec
         switch (rank) {
         case 1:
             return 20;
@@ -429,6 +480,7 @@ public class Stage implements Serializable {
      * Rest the static counter to set the ids
      */
     public static void resetCounter() {
+        // reset static counter of stage count
         stageCount = 0;
     }
 

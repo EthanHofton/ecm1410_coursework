@@ -20,6 +20,7 @@ public class ResultsSegmentTimeCompatitor implements Comparator<Results> {
      * @param pos the position the segment is in the checkpoint times
      */
     public ResultsSegmentTimeCompatitor(int pos) {
+        // set class attrivutes
         this.pos = pos;
     }
 
@@ -32,6 +33,7 @@ public class ResultsSegmentTimeCompatitor implements Comparator<Results> {
      */
     @Override
     public int compare(Results result1, Results result2) {
+        // compare 2 results at a cetrain position using LocalTime.compareTo and Result.calculateTimeToSegment
         return result1.calculateTimeToSegment(pos).compareTo(result2.calculateTimeToSegment(pos));
     }
 }

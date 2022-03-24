@@ -29,9 +29,13 @@ public class Team implements Serializable {
      * @param teamDescription the team description
      */
     Team(String teamName, String teamDescription) {
+        // intialize team riders array list
         this.teamRiders = new ArrayList<>();
+
+        // set team id and incriment static team counter
         this.teamId = teamCount++;
 
+        // set class attributes
         this.teamName = teamName;
         this.teamDescription = teamDescription;
     }
@@ -93,7 +97,10 @@ public class Team implements Serializable {
      */
     public void removeRider(Rider riderToRemove) throws IDNotRecognisedException {
         // findRider throws IDNotRecognisedException
+        // find rider position
         int riderPosition = findRider(riderToRemove);
+
+        // remove rider at that index
         teamRiders.remove(riderPosition);
         
     }
@@ -145,15 +152,7 @@ public class Team implements Serializable {
      * Rest the static counter to set the ids
      */
     public static void resetCounter() {
+        // reset team counter to zero
         teamCount = 0;
-    }
-
-    /**
-     * Rider toString
-     * 
-     * @return a formatted string with relevent rider data
-     */
-    public String toString() {
-        return "Team[";
     }
 }
